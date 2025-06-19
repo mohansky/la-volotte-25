@@ -1,0 +1,24 @@
+name = "la-volotte-25"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+// # For local development
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "la-volotte"
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "a4f9a1d79bd049d4b5b81e3dea982163"
+
+// # For production (these will be set via Cloudflare Pages environment)
+[env.production]
+vars = { }
+
+[[env.production.r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "la-volotte"
+
+[[env.production.kv_namespaces]]
+binding = "SESSION"
+id = "a4f9a1d79bd049d4b5b81e3dea982163"
