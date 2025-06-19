@@ -1,10 +1,6 @@
 @import "tailwindcss";
 
-@plugin "daisyui" {
-  themes: lavolotte --default, lavolotte --prefersdark;
-}
-
-/* @custom-variant dark (&:where([data-theme=forest], [data-theme=forest] *)); */
+@plugin "daisyui";
 
 @plugin "daisyui/theme" {
   name: "lavolotte";
@@ -144,4 +140,3 @@
   border-color: var(--color-primary);
   color: #fff;
 }
- 
