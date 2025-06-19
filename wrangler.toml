@@ -1,4 +1,4 @@
-name = "la-volotte"
+name = "la-volotte-mohansky"
 main = "./dist/_worker.js"
 compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
