@@ -1,0 +1,63 @@
+---
+export const prerender = true;
+// pages/rechtliches/[slug].astro
+import Address from "@/components/Sections/Address.astro";
+import CTA from "@/components/Sections/CTA.astro";
+import Anchor from "@/components/ui/Anchor.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Container from "@/components/ui/Container.astro";
+import Heading from "@/components/ui/Heading.astro";
+import HeadingMD from "@/components/ui/HeadingMD.astro";
+import ListItem from "@/components/ui/ListItem.astro";
+import ListOrdered from "@/components/ui/ListOrdered.astro";
+import ListUnordered from "@/components/ui/ListUnordered.astro";
+import Para from "@/components/ui/Para.astro";
+import Paragraph from "@/components/ui/Paragraph.astro";
+import Layout from "@/layouts/Layout.astro"; 
+import { getCollection, getEntry, render } from "astro:content";
+ 
+
+export async function getStaticPaths() {
+  const rechtliches = await getCollection("rechtliches", ({ data }) => {
+    return data.draft !== true;
+  });
+  return rechtliches.map((rechtlich) => ({
+    params: { slug: rechtlich.id },
+    props: { rechtlich },
+  }));
+}
+
+const { rechtlich } = Astro.props;
+
+const entry = await getEntry("rechtliches", rechtlich.id);
+if (!entry) {
+  throw new Error("Could not find page: " + rechtlich.id);
+}
+const { Content } = await render(entry);
+---
+
+<Layout>
+  <Container width="marginxy" class="font-quicksand">
+    <Breadcrumbs />
+    <Heading size="xl" fontweight="black" fontstyle="sans" class="mb-5" as="h1"
+      >{rechtlich.data.title}</Heading
+    >
+    <Content
+      components={{
+        h1: HeadingMD,
+        h2: HeadingMD,
+        h3: HeadingMD,
+        h4: HeadingMD,
+        h5: HeadingMD,
+        h6: HeadingMD,
+        p: Para,
+        ul: ListUnordered,
+        ol: ListOrdered,
+        li: ListItem,
+        a: Anchor,
+        address: Address,
+      }}
+    />
+  </Container>
+   <CTA/>
+</Layout>

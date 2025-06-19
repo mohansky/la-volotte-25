@@ -1,0 +1,748 @@
+---
+// pages/produkte/index.astro
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Container from "@/components/ui/Container.astro";
+import ProductCard from "@/components/Product/ProductCard.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content"; 
+import CTA from "@/components/Sections/CTA.astro";
+import IconTiAngleDoubleRight from "@/components/Icons/IconTiAngleDoubleRight.astro";
+import IconTiAngleDoubleLeft from "@/components/Icons/IconTiAngleDoubleLeft.astro";
+import IconTiInfoAlt from "@/components/Icons/IconTiInfoAlt.astro";
+import IconTiClose from "@/components/Icons/IconTiClose.astro"; 
+import IconTiSearch from "@/components/Icons/IconTiSearch.astro";
+
+const allProducts = await getCollection("products");
+const publishedProducts = allProducts
+  .filter((product) => product.data.published === true)
+  .sort((a, b) => {
+    const aMatch = a.id.match(/^(\d+)-/);
+    const bMatch = b.id.match(/^(\d+)-/);
+    const aNum = aMatch ? parseInt(aMatch[1], 10) : 0;
+    const bNum = bMatch ? parseInt(bMatch[1], 10) : 0;
+    return aNum - bNum;
+  });
+
+// Extract unique filter values for server-side rendering
+const filterData = {
+  marken: [...new Set(publishedProducts.map(p => p.data.marke).filter(Boolean))].sort(),
+  nadelstaerken: [...new Set(publishedProducts.map(p => p.data.nadelstaerke).filter(Boolean))].sort(),
+  materialien: [...new Set(publishedProducts.map(p => p.data.material).filter(Boolean))].sort()
+};
+---
+
+<script define:vars={{ filterData }}>
+class ProductFilter {
+  constructor() {
+    this.elements = this.getElements();
+    this.state = {
+      currentPage: 1,
+      pageSize: 12,
+      filteredProducts: []
+    };
+    
+    this.originalLeftIconHTML = this.elements.leftArrowIcon?.innerHTML || "";
+    this.originalRightIconHTML = this.elements.rightArrowIcon?.innerHTML || "";
+    
+    this.init();
+  }
+
+  getElements() {
+    return {
+      searchInput: document.getElementById("productSearch"),
+      searchInputMobile: document.getElementById("productSearchMobile"),
+      productsGrid: document.getElementById("productsGrid"),
+      noResultsMessage: document.getElementById("noResultsMessage"),
+      markeFilter: document.getElementById("markeFilter"),
+      markeFilterMobile: document.getElementById("markeFilterMobile"),
+      nadelstaerkeFilter: document.getElementById("nadelstaerkeFilter"),
+      nadelstaerkeFilterMobile: document.getElementById("nadelstaerkeFilterMobile"),
+      materialFilter: document.getElementById("materialFilter"),
+      materialFilterMobile: document.getElementById("materialFilterMobile"),
+      clearFiltersBtn: document.getElementById("clearFilters"),
+      clearFiltersBtnMobile: document.getElementById("clearFiltersMobile"),
+      pageSizeSelector: document.getElementById("pageSizeSelector"),
+      paginationContainer: document.getElementById("paginationContainer"),
+      pageInfo: document.getElementById("pageInfo"),
+      leftArrowIcon: document.getElementById("leftArrowIcon"),
+      rightArrowIcon: document.getElementById("rightArrowIcon"),
+      filterDrawer: document.getElementById("filterDrawer"),
+      filterToggle: document.getElementById("filterToggle"),
+      applyFiltersMobile: document.getElementById("applyFiltersMobile")
+    };
+  }
+
+  init() {
+    if (!this.elements.searchInput || !this.elements.productsGrid || !this.elements.noResultsMessage) {
+      console.error("Required elements not found");
+      return;
+    }
+
+    this.populateFilterOptions();
+    this.loadFromURL();
+    this.bindEvents();
+    this.applyFiltersAndSearch();
+  }
+
+  populateFilterOptions() {
+    // Populate filter dropdowns for both desktop and mobile
+    const filterConfigs = [
+      { desktop: this.elements.markeFilter, mobile: this.elements.markeFilterMobile, data: filterData.marken, defaultText: 'Alle Marken', capitalize: true },
+      { desktop: this.elements.nadelstaerkeFilter, mobile: this.elements.nadelstaerkeFilterMobile, data: filterData.nadelstaerken, defaultText: 'Alle Nadelstärken', capitalize: false },
+      { desktop: this.elements.materialFilter, mobile: this.elements.materialFilterMobile, data: filterData.materialien, defaultText: 'Alle Materialien', capitalize: true }
+    ];
+
+    filterConfigs.forEach(config => {
+      [config.desktop, config.mobile].forEach(element => {
+        if (element) {
+          element.innerHTML = `<option value="">${config.defaultText}</option>`;
+          config.data.forEach(item => {
+            const option = document.createElement("option");
+            option.value = item;
+            option.textContent = config.capitalize ? item.charAt(0).toUpperCase() + item.slice(1) : item;
+            element.appendChild(option);
+          });
+        }
+      });
+    });
+  }
+
+  loadFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    
+    // Load filter values from URL for both desktop and mobile elements
+    const searchValue = params.get('search') || '';
+    const markeValue = params.get('marke') || '';
+    const nadelstaerkeValue = params.get('nadelstaerke') || '';
+    const materialValue = params.get('material') || '';
+    const pageSizeValue = params.get('pageSize') || '12';
+
+    // Set values for desktop elements
+    if (this.elements.searchInput) this.elements.searchInput.value = searchValue;
+    if (this.elements.markeFilter) this.elements.markeFilter.value = markeValue;
+    if (this.elements.nadelstaerkeFilter) this.elements.nadelstaerkeFilter.value = nadelstaerkeValue;
+    if (this.elements.materialFilter) this.elements.materialFilter.value = materialValue;
+    if (this.elements.pageSizeSelector) {
+      this.elements.pageSizeSelector.value = pageSizeValue;
+      this.state.pageSize = parseInt(pageSizeValue);
+    }
+
+    // Set values for mobile elements
+    if (this.elements.searchInputMobile) this.elements.searchInputMobile.value = searchValue;
+    if (this.elements.markeFilterMobile) this.elements.markeFilterMobile.value = markeValue;
+    if (this.elements.nadelstaerkeFilterMobile) this.elements.nadelstaerkeFilterMobile.value = nadelstaerkeValue;
+    if (this.elements.materialFilterMobile) this.elements.materialFilterMobile.value = materialValue;
+    
+    this.state.currentPage = parseInt(params.get('page') || '1');
+  }
+
+  updateURL() {
+    const params = new URLSearchParams();
+    
+    // Get values from desktop elements (mobile elements will be synced)
+    const search = this.elements.searchInput?.value || '';
+    const marke = this.elements.markeFilter?.value || '';
+    const nadelstaerke = this.elements.nadelstaerkeFilter?.value || '';
+    const material = this.elements.materialFilter?.value || '';
+    const pageSize = this.elements.pageSizeSelector?.value || '12';
+    
+    if (search) params.set('search', search);
+    if (marke) params.set('marke', marke);
+    if (nadelstaerke) params.set('nadelstaerke', nadelstaerke);
+    if (material) params.set('material', material);
+    if (this.state.currentPage > 1) params.set('page', this.state.currentPage.toString());
+    if (pageSize !== '12') params.set('pageSize', pageSize);
+    
+    const newURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.history.replaceState({}, '', newURL);
+    
+    // Store current filters in sessionStorage for navigation preservation
+    if (params.toString()) {
+      sessionStorage.setItem('productFilters', params.toString());
+    } else {
+      sessionStorage.removeItem('productFilters');
+    }
+  }
+
+  syncFilters(sourceElement, targetElement) {
+    if (sourceElement && targetElement) {
+      targetElement.value = sourceElement.value;
+    }
+  }
+
+  normalizeString(str) {
+    return (str || "").trim().toLowerCase();
+  }
+
+  bindEvents() {
+    // Search input events for both desktop and mobile
+    if (this.elements.searchInput) {
+      this.elements.searchInput.addEventListener("input", (e) => {
+        this.syncFilters(e.target, this.elements.searchInputMobile);
+        this.state.currentPage = 1;
+        this.applyFiltersAndSearch();
+        this.updateURL();
+      });
+    }
+
+    if (this.elements.searchInputMobile) {
+      this.elements.searchInputMobile.addEventListener("input", (e) => {
+        this.syncFilters(e.target, this.elements.searchInput);
+        // Don't apply filters immediately on mobile - wait for apply button
+      });
+    }
+
+    // Filter dropdown events
+    const filterPairs = [
+      { desktop: this.elements.markeFilter, mobile: this.elements.markeFilterMobile },
+      { desktop: this.elements.nadelstaerkeFilter, mobile: this.elements.nadelstaerkeFilterMobile },
+      { desktop: this.elements.materialFilter, mobile: this.elements.materialFilterMobile }
+    ];
+
+    filterPairs.forEach(pair => {
+      if (pair.desktop) {
+        pair.desktop.addEventListener("change", (e) => {
+          this.syncFilters(e.target, pair.mobile);
+          this.state.currentPage = 1;
+          this.applyFiltersAndSearch();
+          this.updateURL();
+        });
+      }
+
+      if (pair.mobile) {
+        pair.mobile.addEventListener("change", (e) => {
+          this.syncFilters(e.target, pair.desktop);
+          // Don't apply filters immediately on mobile - wait for apply button
+        });
+      }
+    });
+
+    // Page size selector
+    if (this.elements.pageSizeSelector) {
+      this.elements.pageSizeSelector.addEventListener("change", (e) => {
+        this.state.pageSize = parseInt(e.target.value);
+        this.state.currentPage = 1;
+        this.applyFiltersAndSearch();
+        this.updateURL();
+      });
+    }
+
+    // Clear filters buttons
+    [this.elements.clearFiltersBtn, this.elements.clearFiltersBtnMobile].forEach(btn => {
+      if (btn) {
+        btn.addEventListener("click", () => {
+          this.clearAllFilters();
+        });
+      }
+    });
+
+    // Apply filters button for mobile
+    if (this.elements.applyFiltersMobile) {
+      this.elements.applyFiltersMobile.addEventListener("click", () => {
+        this.state.currentPage = 1;
+        this.applyFiltersAndSearch();
+        this.updateURL();
+        // Close drawer after applying filters
+        if (this.elements.filterDrawer) {
+          this.elements.filterDrawer.checked = false;
+        }
+      });
+    }
+
+    // Filter drawer toggle
+    if (this.elements.filterToggle) {
+      this.elements.filterToggle.addEventListener("click", () => {
+        if (this.elements.filterDrawer) {
+          this.elements.filterDrawer.checked = !this.elements.filterDrawer.checked;
+        }
+      });
+    }
+
+    // Keyboard shortcut for search
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        // Always focus desktop search input, or open mobile drawer if on mobile
+        if (window.innerWidth < 768) {
+          if (this.elements.filterDrawer) {
+            this.elements.filterDrawer.checked = true;
+            setTimeout(() => {
+              this.elements.searchInputMobile?.focus();
+              this.elements.searchInputMobile?.select();
+            }, 100);
+          }
+        } else {
+          this.elements.searchInput?.focus();
+          this.elements.searchInput?.select();
+        }
+      }
+    });
+
+    // Handle browser back/forward
+    window.addEventListener('popstate', () => {
+      this.loadFromURL();
+      this.applyFiltersAndSearch();
+    });
+
+    // Handle drawer overlay clicks - only close when clicking the overlay itself
+    const drawerOverlay = document.querySelector('.drawer-overlay');
+    if (drawerOverlay) {
+      drawerOverlay.addEventListener('click', (e) => {
+        // Only close if the click is specifically on the overlay
+        if (e.target === drawerOverlay) {
+          this.elements.filterDrawer.checked = false;
+        }
+      });
+    }
+  }
+
+  clearAllFilters() {
+    // Clear desktop filters
+    if (this.elements.markeFilter) this.elements.markeFilter.value = "";
+    if (this.elements.nadelstaerkeFilter) this.elements.nadelstaerkeFilter.value = "";
+    if (this.elements.materialFilter) this.elements.materialFilter.value = "";
+    if (this.elements.searchInput) this.elements.searchInput.value = "";
+
+    // Clear mobile filters
+    if (this.elements.markeFilterMobile) this.elements.markeFilterMobile.value = "";
+    if (this.elements.nadelstaerkeFilterMobile) this.elements.nadelstaerkeFilterMobile.value = "";
+    if (this.elements.materialFilterMobile) this.elements.materialFilterMobile.value = "";
+    if (this.elements.searchInputMobile) this.elements.searchInputMobile.value = "";
+
+    this.state.currentPage = 1;
+    this.applyFiltersAndSearch();
+    this.updateURL();
+
+    // Close drawer on mobile after clearing
+    if (this.elements.filterDrawer) {
+      this.elements.filterDrawer.checked = false;
+    }
+  }
+
+  applyFiltersAndSearch() {
+    const searchTerm = this.normalizeString(this.elements.searchInput?.value);
+    const selectedMarke = this.normalizeString(this.elements.markeFilter?.value);
+    const selectedNadelstaerke = this.normalizeString(this.elements.nadelstaerkeFilter?.value);
+    const selectedMaterial = this.normalizeString(this.elements.materialFilter?.value);
+
+    const productCards = this.elements.productsGrid.querySelectorAll(".product-card");
+    this.state.filteredProducts = [];
+
+    // Filter products
+    productCards.forEach((card) => {
+      const productName = this.normalizeString(
+        card.querySelector("[data-product-name]")?.textContent
+      );
+      const productMarke = this.normalizeString(
+        card.querySelector("[data-product-marke]")?.textContent
+      );
+      const productNadelstaerke = this.normalizeString(
+        card.querySelector("[data-product-nadelstaerke]")?.textContent
+      );
+      const productMaterial = this.normalizeString(
+        card.querySelector("[data-product-material]")?.textContent
+      );
+
+      const matchesSearch = !searchTerm || 
+        productName.includes(searchTerm) || 
+        productMarke.includes(searchTerm);
+      const matchesMarke = !selectedMarke || productMarke === selectedMarke;
+      const matchesNadelstaerke = !selectedNadelstaerke || productNadelstaerke === selectedNadelstaerke;
+      const matchesMaterial = !selectedMaterial || productMaterial === selectedMaterial;
+
+      card.style.display = "none";
+
+      if (matchesSearch && matchesMarke && matchesNadelstaerke && matchesMaterial) {
+        this.state.filteredProducts.push(card);
+      }
+    });
+
+    // Validate current page
+    const totalPages = Math.ceil(this.state.filteredProducts.length / this.state.pageSize);
+    if (this.state.currentPage > totalPages && totalPages > 0) {
+      this.state.currentPage = 1;
+    }
+
+    // Show products for current page
+    const startIndex = (this.state.currentPage - 1) * this.state.pageSize;
+    const endIndex = startIndex + this.state.pageSize;
+
+    this.state.filteredProducts.slice(startIndex, endIndex).forEach((card) => {
+      card.style.display = "";
+    });
+
+    this.updateUI();
+    this.updatePagination();
+  }
+
+  updateUI() {
+    const hasActiveFilters = this.elements.markeFilter?.value || 
+                           this.elements.nadelstaerkeFilter?.value || 
+                           this.elements.materialFilter?.value ||
+                           this.elements.searchInput?.value;
+
+    // Update no results message
+    if (this.state.filteredProducts.length === 0 && hasActiveFilters) {
+      this.elements.noResultsMessage.style.display = "block";
+    } else {
+      this.elements.noResultsMessage.style.display = "none";
+    }
+
+    // Update clear filters buttons
+    [this.elements.clearFiltersBtn, this.elements.clearFiltersBtnMobile].forEach(btn => {
+      if (btn) {
+        if (hasActiveFilters) {
+          btn.classList.remove("hidden");
+        } else {
+          btn.classList.add("hidden");
+        }
+      }
+    });
+  }
+
+  updatePagination() {
+    const totalProducts = this.state.filteredProducts.length;
+    const totalPages = Math.ceil(totalProducts / this.state.pageSize);
+
+    if (!this.elements.paginationContainer || !this.elements.pageInfo) return;
+
+    if (totalProducts === 0) {
+      this.elements.paginationContainer.style.display = "none";
+      this.elements.pageInfo.style.display = "none";
+      return;
+    }
+
+    this.elements.paginationContainer.style.display = "flex";
+    this.elements.pageInfo.style.display = "block";
+
+    // Update page info
+    const startItem = totalProducts === 0 ? 0 : (this.state.currentPage - 1) * this.state.pageSize + 1;
+    const endItem = Math.min(this.state.currentPage * this.state.pageSize, totalProducts);
+    this.elements.pageInfo.textContent = `${startItem} - ${endItem} von ${totalProducts} Produkten`;
+
+    // Clear pagination
+    this.elements.paginationContainer.innerHTML = "";
+
+    if (totalPages <= 1) {
+      this.elements.paginationContainer.style.display = "none";
+      return;
+    }
+
+    // Create pagination buttons
+    this.createPaginationButtons(totalPages);
+  }
+
+  createPaginationButtons(totalPages) {
+    const getIconHTML = (originalHTML, isDisabled) => {
+      const opacityClass = isDisabled ? 'opacity-30' : 'opacity-100';
+      return originalHTML.replace(/class="([^"]*)"/, `class="$1 ${opacityClass}"`);
+    };
+
+    // Previous button
+    const prevBtn = document.createElement("button");
+    prevBtn.className = `btn btn-sm ${this.state.currentPage === 1 ? "btn-disabled" : ""}`;
+    prevBtn.innerHTML = `${getIconHTML(this.originalLeftIconHTML, this.state.currentPage === 1)} Zurück`;
+    prevBtn.disabled = this.state.currentPage === 1;
+    prevBtn.addEventListener("click", () => this.goToPage(this.state.currentPage - 1));
+    this.elements.paginationContainer.appendChild(prevBtn);
+
+    // Page number buttons
+    this.createPageNumberButtons(totalPages);
+
+    // Next button
+    const nextBtn = document.createElement("button");
+    const isLastPage = this.state.currentPage === totalPages;
+    nextBtn.className = `btn btn-sm ${isLastPage ? "btn-disabled" : ""}`;
+    nextBtn.innerHTML = `Weiter ${getIconHTML(this.originalRightIconHTML, isLastPage)}`;
+    nextBtn.disabled = isLastPage;
+    nextBtn.addEventListener("click", () => this.goToPage(this.state.currentPage + 1));
+    this.elements.paginationContainer.appendChild(nextBtn);
+  }
+
+  createPageNumberButtons(totalPages) {
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.state.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // First page + ellipsis if needed
+    if (startPage > 1) {
+      this.createPageButton(1);
+      if (startPage > 2) {
+        const dots = document.createElement("span");
+        dots.className = "px-2";
+        dots.textContent = "...";
+        this.elements.paginationContainer.appendChild(dots);
+      }
+    }
+
+    // Visible page range
+    for (let i = startPage; i <= endPage; i++) {
+      this.createPageButton(i);
+    }
+
+    // Ellipsis + last page if needed
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        const dots = document.createElement("span");
+        dots.className = "px-2";
+        dots.textContent = "...";
+        this.elements.paginationContainer.appendChild(dots);
+      }
+      this.createPageButton(totalPages);
+    }
+  }
+
+  createPageButton(pageNumber) {
+    const pageBtn = document.createElement("button");
+    pageBtn.className = `btn btn-sm ${pageNumber === this.state.currentPage ? "btn-primary text-base-200" : ""}`;
+    pageBtn.textContent = pageNumber.toString();
+    pageBtn.addEventListener("click", () => this.goToPage(pageNumber));
+    this.elements.paginationContainer.appendChild(pageBtn);
+  }
+
+  goToPage(page) {
+    this.state.currentPage = page;
+    this.applyFiltersAndSearch();
+    this.updateURL();
+  }
+}
+
+// Initialize when DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  new ProductFilter();
+});
+</script>
+
+<Layout>
+  <Container width="marginxy">
+    <Breadcrumbs />
+
+    <!-- Mobile Filter Button (visible only on mobile) -->
+    <div class="mb-4 md:hidden">
+      <button id="filterToggle" class="btn btn-primary w-full">
+        <IconTiSearch class="w-5 h-5" />
+        Filter & Suche
+      </button>
+    </div>
+
+    <!-- Drawer for Mobile -->
+    <div class="drawer">
+      <input id="filterDrawer" type="checkbox" class="drawer-toggle" />
+      
+      <!-- Drawer Side (Mobile Filter Panel) -->
+      <div class="drawer-side md:hidden z-50">
+        <label for="filterDrawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <div class="bg-base-200 min-h-full w-80 p-4" onclick="event.stopPropagation()">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-semibold">Filter & Suche</h3>
+            <label for="filterDrawer" class="btn btn-sm btn-circle">
+              <IconTiClose class="w-4 h-4" />
+            </label>
+          </div>
+          
+          <!-- Mobile Filter Content -->
+          <div class="space-y-4">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend font-light opacity-75">Produkte suchen</legend>
+              <label class="input input-primary w-full"> 
+                <IconTiSearch class="w-5 h-5 opacity-75" />
+                <input
+                  type="search"
+                  id="productSearchMobile"
+                  placeholder="Produkte suchen..."
+                />
+              </label>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend font-light opacity-75">Marke</legend>
+              <select
+                id="markeFilterMobile"
+                class="capitalize select select-primary w-full"
+              >
+                <option value="">Alle Marken</option>
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend font-light opacity-75">Nadelstärke</legend>
+              <select
+                id="nadelstaerkeFilterMobile"
+                class="select select-primary w-full"
+              >
+                <option value="">Alle Nadelstärken</option>
+              </select>
+            </fieldset>
+
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend font-light opacity-75">Material</legend>
+              <select
+                id="materialFilterMobile"
+                class="select select-primary w-full"
+              >
+                <option value="">Alle Materialien</option>
+              </select>
+            </fieldset>
+
+            <button id="clearFiltersMobile" class="hidden btn btn-soft w-full">
+              <IconTiClose class="w-3 h-3" />
+              Filter zurücksetzen
+            </button>
+
+            <div class="mt-6 pt-4 border-t">
+              <button id="applyFiltersMobile" class="btn btn-primary w-full">
+                Filter anwenden
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="drawer-content">
+        <!-- Desktop Filter Card (visible md and above) -->
+        <div class="hidden md:block mb-6 font-quicksand card bg-base-100 border border-primary p-4">
+          <div class="card-body flex flex-col justify-between p-4">
+            <div class="flex flex-row items-center justify-between flex-wrap gap-4">
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend font-light opacity-75">Marke</legend>
+                <select
+                  id="markeFilter"
+                  class="capitalize select select-primary w-full md:w-48"
+                >
+                  <option value="">Alle Marken</option>
+                </select>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend font-light opacity-75">Nadelstärke</legend>
+                <select
+                  id="nadelstaerkeFilter"
+                  class="select select-primary w-full md:w-48"
+                >
+                  <option value="">Alle Nadelstärken</option>
+                </select>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend font-light opacity-75">Material</legend>
+                <select
+                  id="materialFilter"
+                  class="select select-primary w-full md:w-48"
+                >
+                  <option value="">Alle Materialien</option>
+                </select>
+              </fieldset>
+
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend font-light opacity-75">Produkte suchen</legend>
+                <label class="input input-primary w-full"> 
+                  <IconTiSearch class="w-5 h-5 opacity-75" />
+                  <input
+                    type="search"
+                    id="productSearch"
+                    placeholder="Produkte suchen..."
+                  />
+                  <kbd class="kbd kbd-xs">⌘</kbd> /
+                  <kbd class="kbd kbd-xs">Ctrl</kbd> +
+                  <kbd class="kbd kbd-xs">K</kbd>
+                </label>
+              </fieldset>
+            </div>
+
+            <div class="w-full flex justify-between items-center">
+              <fieldset class="fieldset">
+                <legend class="fieldset-legend font-light opacity-75">Produkte pro Seite</legend>
+                <select
+                  id="pageSizeSelector"
+                  class="select select-primary w-full md:w-32"
+                >
+                  <option value="12">12</option>
+                  <option value="24">24</option>
+                  <option value="48">48</option>
+                </select>
+              </fieldset>
+
+              <div id="pageInfo" class="place-self-end text-sm text-gray-600"></div>
+
+              <button id="clearFilters" class="hidden place-self-end btn btn-soft">
+                <IconTiClose class="w-3 h-3" />
+                Filter zurücksetzen
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products per page selector for mobile -->
+        <div class="mb-4 md:hidden">
+          <fieldset class="fieldset">
+            <legend class="fieldset-legend font-light opacity-75">Produkte pro Seite</legend>
+            <select
+              id="pageSizeSelectorMobile"
+              class="select select-primary w-full"
+            >
+              <option value="12">12</option>
+              <option value="24">24</option>
+              <option value="48">48</option>
+            </select>
+          </fieldset>
+        </div>
+
+        <!-- Page Info for Mobile -->
+        <div class="mb-4 md:hidden">
+          <div id="pageInfoMobile" class="text-sm text-gray-600 text-center"></div>
+        </div>
+
+        <div id="noResultsMessage" class="hidden mb-6">
+          <div class="alert alert-warning">
+            <IconTiInfoAlt class="stroke-current shrink-0 w-6 h-6" />
+            <span>Keine Produkte gefunden. Bitte versuchen Sie eine andere Suche.</span>
+          </div>
+        </div>
+
+        <div
+          id="productsGrid"
+          class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-10 lg:gap-15"
+        >
+          {
+            publishedProducts.map((product) => (
+              <div class="product-card">
+                <ProductCard product={product.data} />
+                <span class="hidden" data-product-name>
+                  {product.data.name}
+                </span>
+                <span class="hidden" data-product-marke>
+                  {product.data.marke || ""}
+                </span>
+                <span class="hidden" data-product-nadelstaerke>
+                  {product.data.nadelstaerke || ""}
+                </span>
+                <span class="hidden" data-product-material>
+                  {product.data.material || ""}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="flex justify-center my-20">
+          <div id="paginationContainer" class="join">
+            <div class="hidden">
+              <div id="leftArrowIcon">
+                <IconTiAngleDoubleLeft class="w-4 h-4 opacity-10" />
+              </div>
+              <div id="rightArrowIcon">
+                <IconTiAngleDoubleRight class="w-4 h-4 opacity-10" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Container>
+  <CTA />
+</Layout>

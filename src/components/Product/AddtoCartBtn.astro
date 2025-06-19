@@ -1,0 +1,87 @@
+---
+// components/Product/AddtoCartBtn.astro
+import Button from "../ui/Button.astro";
+
+interface Product {
+  id?: number | string;
+  preis?: number | string;
+  slug?: string;
+  beschreibung?: string;
+  featureImage?: string;
+  name?: string;
+  farbenFotos?: string;
+}
+
+interface Props {
+  product: Product;
+  variant?: "primary" | "gradient" | "outline" | "default" | "circle";
+  size?: "sm" | "md" | "lg" | "icon";
+  class?: string;
+  className?: string;
+  fullWidth?: boolean;
+}
+
+const {
+  product,
+  variant = "gradient",
+  size,
+  class: customClass,
+  className,
+  fullWidth = true,
+} = Astro.props;
+
+const { id, preis, slug, beschreibung, name, farbenFotos } = product;
+
+let farbenOptions: string[] = [];
+let featureImage = product.featureImage;
+
+if (farbenFotos) {
+  // Use Vite's import.meta.glob to get all images for this product
+  const imageModules = import.meta.glob('/src/content/products/images/**/*.{png,jpg,jpeg,gif,webp}', { 
+    eager: true,
+    query: '?url',
+    import: 'default'
+  });
+  
+  // Filter images for the specific farbenFotos folder
+  const folderImages = Object.entries(imageModules)
+    .filter(([path]) => path.includes(`/images/${farbenFotos}/`))
+    .map(([path, url]) => ({
+      path,
+      url: url as string,
+      name: path.split('/').pop()?.split('.')[0] || ''
+    }));
+
+  if (folderImages.length > 0) {
+    farbenOptions = folderImages.map(img => img.name);
+    featureImage = folderImages[0].url;
+  }
+}
+
+const farbenFotosOptions = farbenOptions.join(" | ");
+
+// Build className string
+const baseClasses = "snipcart-add-item";
+const widthClasses = fullWidth ? "w-full md:w-auto" : "";
+const customClasses = customClass || className || "";
+const finalClassName = [baseClasses, widthClasses, customClasses]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<Button
+  variant={variant}
+  size={size}
+  className={finalClassName}
+  title=`${name} zum Warenkorb hinzufügen`
+  data-item-id={id}
+  data-item-price={preis}
+  data-item-url={slug}
+  data-item-description={beschreibung}
+  data-item-image={featureImage}
+  data-item-name={name}
+  data-item-custom1-name="Farbe"
+  data-item-custom1-options={farbenFotosOptions}
+>
+  in den Warenkorb
+</Button>

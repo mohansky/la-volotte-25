@@ -1,0 +1,217 @@
+---
+// components/ui/Address.astro
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "@/lib/utils";
+
+type VariantType = "default" | "compact" | "card" | "inline" | "footer";
+
+type SizeType = "sm" | "md" | "lg";
+
+interface Props extends HTMLAttributes<"address"> {
+  variant?: VariantType;
+  size?: SizeType;
+  class?: string;
+  // German address structure
+  name?: string; // Name (Person/Company)
+  street?: string; // Straße + Hausnummer
+  additionalLine?: string; // c/o, Zusatz, etc.
+  postalCode?: string; // PLZ (5 digits)
+  city?: string; // Ort
+  state?: string; // Bundesland (optional)
+  country?: string; // Land (usually "Deutschland")
+  phone?: string; // Telefon
+  mobile?: string; // Mobiltelefon
+  ust?: string; // Fax (still common in Germany)
+  email?: string;
+  website?: string;
+}
+
+const {
+  variant = "default",
+  size = "md",
+  class: className,
+  name,
+  street,
+  additionalLine,
+  postalCode,
+  city,
+  state,
+  country = "Deutschland", // Default to Germany
+  phone,
+  mobile,
+  ust,
+  email,
+  website,
+  ...rest
+} = Astro.props;
+
+const variants: Record<VariantType, string> = {
+  default: "not-italic leading-relaxed",
+  compact: "not-italic leading-tight space-y-1",
+  card: "not-italic p-4 bg-muted rounded-lg border shadow-sm",
+  inline: "not-italic inline",
+  footer: "not-italic text-muted-foreground leading-relaxed",
+};
+
+const sizes: Record<SizeType, string> = {
+  sm: "text-sm",
+  md: "text-base",
+  lg: "text-lg",
+};
+
+const classes = cn(
+  "font-normal mb-5",
+  variants[variant],
+  sizes[size],
+  className
+);
+
+// Check if structured data is provided
+const hasStructuredData =
+  name ||
+  street ||
+  additionalLine ||
+  postalCode ||
+  city ||
+  state ||
+  country ||
+  phone ||
+  mobile ||
+  ust ||
+  email ||
+  website;
+
+// Format German phone number for tel: link (remove spaces, parentheses, etc.)
+const formatPhoneForTel = (phoneNumber: string) => {
+  if (!phoneNumber) return "";
+  // Remove all non-digit characters except +
+  let cleaned = phoneNumber.replace(/[^\d+]/g, "");
+  // If it starts with 0, replace with +49
+  if (cleaned.startsWith("0")) {
+    cleaned = "+49" + cleaned.slice(1);
+  }
+  return cleaned;
+};
+
+// Format postal code (German PLZ should be 5 digits)
+const formatPostalCode = (plz: string) => {
+  if (!plz) return "";
+  // Ensure it's exactly 5 digits for German postal codes
+  const digits = plz.replace(/\D/g, "");
+  return digits.padStart(5, "0").slice(0, 5);
+};
+---
+
+<address class={classes} {...rest}>
+  {
+    hasStructuredData ? (
+      <div class="space-y-0.5">
+        {/* Name/Company */}
+        {name && (
+          <div class="address-name font-medium text-foreground">{name}</div>
+        )}
+
+        {/* Additional line (c/o, etc.) */}
+        {additionalLine && (
+          <div class="address-additional text-muted-foreground">
+            {additionalLine}
+          </div>
+        )}
+
+        {/* Street Address */}
+        {street && <div class="street-address">{street}</div>}
+
+        {/* German format: PLZ Stadt */}
+        {(postalCode || city) && (
+          <div class="postal-city">
+            {postalCode && (
+              <span class=" ">{formatPostalCode(postalCode)}</span>
+            )}
+            {postalCode && city && " "}
+            {city && <span class="city">{city}</span>}
+          </div>
+        )}
+
+        {/* State (Bundesland) - optional in German addresses */}
+        {state && <div class="state text-muted-foreground">{state}</div>}
+
+        {/* Country (usually omitted if Deutschland) */}
+        {country && <div class=" ">{country}</div>}
+
+        {/* Contact Information */}
+        <div class="contact-info space-y-1 mt-3">
+          {phone && (
+            <div class="contact-phone">
+              <span class="contact-label font-medium text-muted-foreground min-w-[3rem] inline-block">
+                Telefonnummer.:{" "}
+              </span>
+              <a
+                href={`tel:${formatPhoneForTel(phone)}`}
+                class="hover:underline transition-colors duration-200"
+              >
+                {phone}
+              </a>
+            </div>
+          )}
+
+          {mobile && (
+            <div class="contact-mobile">
+              <span class="contact-label font-medium text-muted-foreground min-w-[3rem] inline-block">
+                Mobil:{" "}
+              </span>
+              <a
+                href={`tel:${formatPhoneForTel(mobile)}`}
+                class="hover:underline transition-colors duration-200"
+              >
+                {mobile}
+              </a>
+            </div>
+          )}
+
+          {email && (
+            <div class="contact-email">
+              <span class="contact-label font-medium text-muted-foreground min-w-[3rem] inline-block">
+                E-Mail:{" "}
+              </span>
+              <a
+                href={`mailto:${email}`}
+                class="hover:underline text-primary transition-colors duration-200"
+              >
+                {email}
+              </a>
+            </div>
+          )}
+
+          {ust && (
+            <div class="contact-ust">
+              <span class="contact-label font-medium text-muted-foreground min-w-[3rem] inline-block">
+                USt-IdNr.:
+              </span>
+              <span>{ust}</span>
+            </div>
+          )}
+
+          {website && (
+            <div class="contact-website">
+              <span class="contact-label font-medium text-muted-foreground min-w-[3rem] inline-block">
+                Web:{" "}
+              </span>
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:underline text-primary transition-colors duration-200"
+              >
+                {website.replace(/^https?:\/\//, "")}
+              </a>
+            </div>
+          )}
+        </div>
+
+        <slot />
+      </div>
+    ) : (
+      <slot />
+    )
+  }
+</address>

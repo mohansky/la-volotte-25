@@ -1,0 +1,40 @@
+---
+// components/Product/ProductCardPrice.astro
+import Heading from '../ui/Heading.astro';
+
+interface Product {
+  preis: number;
+  preisStatt: number;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { preis, preisStatt } = product;
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(amount);
+};
+---
+
+<div class="my-0 md:mb-4">
+  <div class="flex place-items-center text-primary justify-center md:gap-2">
+    <Heading class="text-center" fontweight="bold"
+      >{formatCurrency(preis)}</Heading
+    >
+    {
+      preisStatt > 0 && (
+        <Heading class="text-center" fontweight="thin" size="xs">
+          <s>{formatCurrency(preisStatt)} </s>
+        </Heading>
+      )
+    }
+  </div>
+  <p class="hidden md:block text-center font-quicksand">
+    <small> inkl. MwSt. zzgl. Versandkosten* </small>
+  </p>
+</div>

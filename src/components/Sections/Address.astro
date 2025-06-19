@@ -1,0 +1,72 @@
+---
+// components/Sections/Address.astro
+// import { Icon } from "astro-icon/components";
+import Heading from "../ui/Heading.astro";
+import Paragraph from "../ui/Paragraph.astro";
+import IconSwitcher from "../ui/IconSwitcher.astro";
+
+interface Contact {
+  icon: string;
+  link: string;
+  text: string[];
+}
+
+interface Social {
+  icon: string;
+  link: string;
+  text: string;
+}
+
+interface Props {
+  contactTitle: string;
+  contactSubtitle: string;
+  contactdetails: Contact[];
+  socialTitle: string;
+  socials: Social[];
+}
+
+const { contactTitle, contactSubtitle, contactdetails, socialTitle, socials } =
+  Astro.props;
+---
+
+<div>
+  <Heading size="xl">{contactTitle}</Heading>
+  <Heading size="lg" class="mb-5 opacity-60">{contactSubtitle}</Heading>
+  <ul class="space-y-2">
+    {
+      contactdetails.map((item) => (
+        <li class="group mb-3">
+          <a href={item.link} class="flex items-start gap-3 link link-hover">
+            <IconSwitcher
+              icon={item.icon as "phone" | "envelope" | "map-pin"}
+              class="pt-1 w-6 h-6 fill-primary group-hover:fill-primary/60 transition-all duration-300 ease-in-out"
+            />
+            <span>
+              {item.text.map((text) => (
+                <Paragraph variant="plain" class="flex flex-col gap-1">
+                  {text}
+                </Paragraph>
+              ))}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <Heading size="lg" class="mb-5 mt-10">{socialTitle}</Heading>
+  <ul class="flex gap-8">
+    {
+      socials.map((item) => (
+        <li class="group">
+          <a href={item.link} aria-label={item.text}>
+            <IconSwitcher
+              icon={item.icon as "facebook" | "instagram"}
+              class="w-15 h-15 fill-primary group-hover:fill-primary/60 transition-all duration-300 ease-in-out"
+            />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

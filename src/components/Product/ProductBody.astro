@@ -1,0 +1,36 @@
+---
+// components/Product/ProductBody.astro
+interface Product {
+  dprice?: string | number;
+  priceBefore?: string | number;
+  cprice?: string | number;
+  cpricetext?: string;
+  menge?: string;
+  nadel?: string;
+  laenge?: string;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { dprice, priceBefore, cprice, cpricetext, menge, nadel, laenge } = product;
+---
+
+<div class="my-4">
+  <span class="lead text-primary font-weight-medium">
+    {dprice} €
+  </span>
+  <s>{priceBefore}</s>
+  <br />
+  <span class="lead text-primary font-weight-medium">
+    {cprice}
+    <small>{cpricetext}</small>
+  </span>
+  <small> inkl. MwSt. zzgl. Versandkosten*</small>
+  <p>
+    Gewicht: {menge}
+    Lauflänge: {laenge}
+  </p>
+</div>

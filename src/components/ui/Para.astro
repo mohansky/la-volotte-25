@@ -1,0 +1,10 @@
+---
+// components/ui/Para.astro
+import { cn } from "@/lib/utils";
+
+const { class: className, props } = Astro.props;
+---
+
+<p class={cn("font-quicksand indent-4 leading-8 pb-3 text-justify", className)} {...props}>
+  <slot />
+</p>

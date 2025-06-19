@@ -1,0 +1,39 @@
+---
+// components/Sections/Hero.astro
+import Heading from "../ui/Heading.astro";
+import Button from "../ui/Button.astro";
+import { getCollection } from "astro:content";
+import R2Image from "../ui/R2Image.astro";
+
+const siteData = await getCollection("siteData");
+const siteInfo = siteData[0].data;
+const hero = siteInfo.hero[0];
+---
+
+<div class="hero bg-base-100 min-h-screen">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <R2Image
+      src={hero.bgImage}
+      width={720}
+      height={405}
+      class="rounded-lg shadow-2xl mt-14 lg:mt-0"
+      alt="La Volotte"
+      loading="eager"
+      /> 
+
+    <div>
+      <Heading size="xxl" fontweight="bold" class="mb-5" as="h1"
+        >La Volotte</Heading
+      >
+      <Heading size="xl" fontweight="light" class="text-balance mb-6">
+        {hero.title}
+      </Heading>
+      <Heading size="sm" fontweight="light" class="mb-8" as="h3">
+        {hero.subtitle}</Heading
+      >
+      <Button href={hero.btnLink} variant="outline" title={hero.btnText}
+        >{hero.btnText}</Button
+      >
+    </div>
+  </div>
+</div>

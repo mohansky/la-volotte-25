@@ -1,0 +1,107 @@
+---
+// components/ui/Paragraph.astro
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "@/lib/utils";
+
+type VariantType =
+  | "default"
+  | "plain"
+  | "lead"
+  | "small"
+  | "muted"
+  | "quote";
+
+type SizeType =
+  | "xl"
+  | "lg"
+  | "md"
+  | "sm"
+  | "xs";
+
+type FontWeightType =
+  | "black"
+  | "bold"
+  | "semibold"
+  | "normal"
+  | "medium"
+  | "light"
+  | "extralight"
+  | "thin";
+
+type FontStyleType = "sans" | "serif";
+
+type AlignType = "left" | "center" | "right" | "justify";
+
+interface Props extends HTMLAttributes<"p"> {
+  variant?: VariantType;
+  size?: SizeType;
+  fontweight?: FontWeightType;
+  fontstyle?: FontStyleType;
+  align?: AlignType;
+  class?: string;
+}
+
+const {
+  variant = "default",
+  size = "md",
+  fontweight = "normal",
+  fontstyle = "sans",
+  align = "justify",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants: Record<VariantType, string> = {
+  default: "pb-4",
+  plain: "",
+  lead: "text-muted-foreground pb-6",
+  small: "text-muted-foreground pb-2",
+  muted: "text-muted-foreground/70 pb-3",
+  quote: "border-l-4 border-primary/30 pl-6 italic pb-4",
+};
+
+const sizes: Record<SizeType, string> = {
+  xl: "text-xl md:text-2xl",
+  lg: "text-lg md:text-xl",
+  md: "text-base md:text-lg",
+  sm: "text-sm md:text-base",
+  xs: "text-xs md:text-sm",
+};
+
+const fontweights: Record<FontWeightType, string> = {
+  black: "font-black",
+  bold: "font-bold",
+  semibold: "font-semibold",
+  normal: "font-normal",
+  medium: "font-medium",
+  light: "font-light",
+  extralight: "font-extralight",
+  thin: "font-thin",
+};
+
+const fontstyles: Record<FontStyleType, string> = {
+  sans: "font-quicksand",
+  serif: "font-quicksand",
+};
+
+const aligns: Record<AlignType, string> = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+  justify: "text-justify",
+};
+
+const classes = cn(
+  "tracking-wide leading-8",
+  variants[variant],
+  sizes[size],
+  fontweights[fontweight],
+  fontstyles[fontstyle],
+  aligns[align],
+  className
+);
+---
+
+<p class={classes} {...rest}>
+  <slot />
+</p>

@@ -1,0 +1,39 @@
+---
+// components/Product/FarbenSlider.astro
+import { Image } from "astro:assets";
+
+interface FarbImage {
+  farbimg: string;
+  farbtitle: string;
+}
+
+interface Props {
+  farbimages?: FarbImage[];
+}
+
+const { farbimages = [] } = Astro.props;
+---
+
+<h1 class="font-weight-light text-center text-lg-left mt-4 mb-5">
+  Farben
+</h1>
+
+{farbimages && farbimages.length > 0 && ( 
+  <ul class="gallery">
+    {farbimages.map((farbimage: FarbImage) => (
+      <li class="d-block mb-4">
+        <a href={farbimage.farbimg}>
+          <Image
+            class="img-fluid"
+            src={farbimage.farbimg}
+            alt={farbimage.farbtitle}
+            width={200}
+            height={200}
+            title={farbimage.farbtitle}
+          />
+          <h5 class="text-center">{farbimage.farbtitle}</h5>
+        </a>
+      </li>
+    ))}
+  </ul> 
+)}

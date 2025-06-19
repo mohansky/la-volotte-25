@@ -1,0 +1,108 @@
+---
+// components/Product/ProductCardImage.astro
+import { Image } from "astro:assets";
+import LVLogo from "../Icons/LVLogo.astro";
+
+interface Props {
+  subDirectory?: string;
+  width?: number;
+  height?: number;
+}
+
+interface ImageFile {
+  filename: string;
+  url: string;
+  size: number;
+  lastModified: string;
+  colorInfo: string;
+}
+
+interface ImageManifest {
+  generated: string;
+  products: Record<string, ImageFile[]>;
+  features: Record<string, ImageFile[]>;
+}
+
+const { subDirectory = "", width = 600, height = 600 } = Astro.props;
+
+function getProductName(csvPath: string): string {
+  if (!csvPath) return "Image";
+  const pathParts = csvPath.split("/");
+  return pathParts[pathParts.length - 2] || "Image";
+}
+
+const imageName = getProductName(subDirectory);
+
+// Load manifest server-side
+let primaryImageUrl = "";
+let hasImage = false;
+
+if (subDirectory) {
+  try {
+    // You'll need to adjust this path based on your project structure
+    const manifestResponse = await fetch(
+      `${Astro.url.origin}/image-manifest.json`
+    );
+    const manifestData: ImageManifest = await manifestResponse.json();
+
+    if (manifestData?.features) {
+      const cleanPath = subDirectory.startsWith("/")
+        ? subDirectory.slice(1)
+        : subDirectory;
+      let featureImages: ImageFile[] = manifestData.features[cleanPath] || [];
+
+      // Try partial matches if no exact match
+      if (featureImages.length === 0) {
+        const availableFeatures = Object.keys(manifestData.features);
+        const partialMatch = availableFeatures.find(
+          (cat: string) => cat.includes(cleanPath) || cleanPath.includes(cat)
+        );
+        if (partialMatch) {
+          featureImages = manifestData.features[partialMatch] || [];
+        }
+      }
+
+      // Get primary image URL
+      if (featureImages.length > 0) {
+        const sortedImages = featureImages.sort(
+          (a: ImageFile, b: ImageFile) => {
+            const aPriority = a.filename.includes("-1.") ? 1 : 2;
+            const bPriority = b.filename.includes("-1.") ? 1 : 2;
+            return aPriority - bPriority;
+          }
+        );
+        primaryImageUrl = sortedImages[0].url;
+        hasImage = true;
+      }
+    }
+  } catch (error) {
+    console.error("Error loading manifest server-side:", error);
+  }
+}
+---
+
+<figure class="relative">
+  {
+    hasImage ? (
+      <Image
+        src={primaryImageUrl}
+        alt={imageName}
+        width={width}
+        height={height}
+        class="object-contain bg-white border border-primary rounded-lg"
+        loading="lazy"
+        format="webp"
+      />
+    ) : (
+      <div class="bg-white border border-primary rounded-lg flex items-center justify-center">
+        <LVLogo />
+      </div>
+    )
+  }
+</figure>
+
+<style>
+  figure {
+    margin: 0;
+  }
+</style>

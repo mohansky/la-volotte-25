@@ -1,0 +1,184 @@
+---
+import { getCollection } from "astro:content";
+
+const siteData = await getCollection("siteData");
+const siteInfo = siteData[0].data;
+const site = siteInfo;
+---
+
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "@id": `${site.basepath}`,
+        name: `${site.title}`,
+        description: `${site.description}`,
+        url: `${site.basepath}`,
+        telephone: `${site.contactdetails[0].text[0]}`,
+        email: `${site.contactdetails[1].text[0]}`,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: `${site.contactdetails[2].text[0]}`,
+          addressLocality:  `${site.contactdetails[2].text[1]}`,
+          postalCode: `${site.contactdetails[2].text[1]}`,
+          addressRegion: "Rheinland-Pfalz",
+          addressCountry:  `${site.contactdetails[2].text[2]}`,
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: "48.7758",
+          longitude: "9.1829",
+        },
+        openingHours: ["Mo-Fr 10:00-18:00", "Sa 10:00-16:00"],
+        priceRange: "€€",
+        paymentAccepted: ["Cash", "Credit Card", "EC-Card"],
+        currenciesAccepted: "EUR",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Woll- und Strickwaren",
+          itemListElement: [
+            {
+              "@type": "OfferCatalog",
+              name: "Naturwolle",
+              description: "Hochwertige Naturwolle aus verschiedenen Ländern",
+            },
+            {
+              "@type": "OfferCatalog",
+              name: "Stricknadeln",
+              description:
+                "Stricknadeln in verschiedenen Größen und Materialien",
+            },
+            {
+              "@type": "OfferCatalog",
+              name: "Strickzubehör",
+              description:
+                "Maschenmarkierer, Nadelspiele und weiteres Strickzubehör",
+            },
+          ],
+        },
+        areaServed: {
+          "@type": "GeoCircle",
+          geoMidpoint: {
+            "@type": "GeoCoordinates",
+            latitude: "48.7758",
+            longitude: "9.1829",
+          },
+          geoRadius: "50000",
+        },
+        knowsAbout: [
+          "Stricken",
+          "Häkeln",
+          "Filzen",
+          "Naturwolle",
+          "Handarbeit",
+        ],
+        makesOffer: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Strick-Workshops",
+              description: "Workshops für Anfänger und Fortgeschrittene",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Individuelle Anfertigungen",
+              description: "Maßgeschneiderte Strickwaren nach Kundenwunsch",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Strickberatung",
+              description: "Kompetente Beratung bei Strickprojekten",
+            },
+          },
+        ],
+      },
+      {
+        "@type": "Product",
+        "@id": "https://la-volotte.de/products/merino-silk-yarn",
+        name: "Merino-Seide Garn",
+        description: "Hochwertiges Naturgarn aus 80% Schurwolle und 20% Seide",
+        image: "https://la-volotte.de/images/merino-silk-yarn.jpg",
+        brand: {
+          "@type": "Brand",
+          name: "La Volotte",
+        },
+        material: [
+          {
+            "@type": "PropertyValue",
+            name: "Fasergehalt",
+            value: "80% Schurwolle, 20% Seide",
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Nadelstärke",
+            value: "2,0-3,0 mm",
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Gewicht",
+            value: "100g",
+          },
+        ],
+        category: "Naturwolle",
+        offers: {
+          "@type": "Offer",
+          price: "24.90",
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          seller: {
+            "@id": "https://la-volotte.de/produkte/",
+          },
+        },
+      },
+      {
+        "@type": "Product",
+        "@id": "https://la-volotte.de/produkte/baby-alpaca-yarn",
+        name: "Baby Alpaka Garn",
+        description: "Luxuriöses 100% Baby Alpaka Garn, besonders weich",
+        image: "https://la-volotte.de/images/baby-alpaca-yarn.jpg",
+        brand: {
+          "@type": "Brand",
+          name: "La Volotte",
+        },
+        material: [
+          {
+            "@type": "PropertyValue",
+            name: "Fasergehalt",
+            value: "100% Baby Alpaka",
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Nadelstärke",
+            value: "2,0-3,5 mm",
+          },
+          {
+            "@type": "PropertyValue",
+            name: "Gewicht",
+            value: "50g",
+          },
+        ],
+        category: "Alpaka",
+        offers: {
+          "@type": "Offer",
+          price: "32.90",
+          priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          seller: {
+            "@id": "https://la-volotte.de/",
+          },
+        },
+      },
+    ],
+  })}
+/>

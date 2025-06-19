@@ -1,0 +1,49 @@
+---
+// components/ui/BackToTopBtn.astro
+import IconTiAngleUp from "../Icons/IconTiAngleUp.astro";
+import Button from "./Button.astro";
+---
+
+<Button
+  id="back-to-top"
+  className="fixed bottom-6 right-6 z-50 bg-primary"
+  aria-label="Back to top"
+  title="Back to top"
+  variant="circle"
+  size="icon"
+>
+  <IconTiAngleUp class="h-6 w-6 fill-neutral-content" />
+</Button>
+
+<script>
+  const backToTopButton = document.getElementById("back-to-top");
+
+  if (backToTopButton) {
+    // Show/hide button based on scroll position
+    window.addEventListener("scroll", () => {
+      if (window.pageYOffset > 300) {
+        backToTopButton.classList.remove(
+          "opacity-0",
+          "translate-y-4",
+          "pointer-events-none"
+        );
+        backToTopButton.classList.add("opacity-100", "translate-y-0");
+      } else {
+        backToTopButton.classList.add(
+          "opacity-0",
+          "translate-y-4",
+          "pointer-events-none"
+        );
+        backToTopButton.classList.remove("opacity-100", "translate-y-0");
+      }
+    });
+
+    // Smooth scroll to top when clicked
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+  }
+</script>

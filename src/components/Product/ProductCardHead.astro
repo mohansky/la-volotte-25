@@ -1,0 +1,23 @@
+---
+import Heading from "../ui/Heading.astro";
+
+// components/Product/ProductCardHead.astro
+
+interface Product {
+  id: string;
+  name: string;
+  marke?: string;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { id, name, marke } = product;
+---
+
+<a href={`/produkte/${id}`} class="text-center tooltip tooltip-left" data-tip={name} title={name} >
+  <Heading class="line-clamp-1">{name}</Heading>
+  <Heading size="xs" fontweight="normal" as="h3">{marke}</Heading>
+</a>

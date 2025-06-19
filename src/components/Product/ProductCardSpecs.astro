@@ -1,0 +1,45 @@
+---
+// components/Product/ProductCardSpecs.astro
+import IconNadelstaerke from "../Icons/IconNadelstaerke.astro";
+import IconWeight from "../Icons/IconWeight.astro";
+import Heading from "../ui/Heading.astro";
+
+interface Product {
+  beschreibung?: string;
+  menge?: string;
+  nadelstaerke?: string;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { beschreibung, menge, nadelstaerke } = product;
+---
+
+ 
+<Heading class="line-clamp-2 m-0 p-0" size="xs" fontweight="normal" as="h4"
+  >{beschreibung}</Heading
+>
+<Heading
+  class="flex justify-evenly gap-1"
+  size="xs"
+  fontweight="normal"
+  as="h5"
+>
+  <span
+    class="flex tooltip tooltip-left items-center gap-2"
+    data-tip="Menge"
+  >
+    <IconWeight class="w-4 h-4" />
+    {menge}
+  </span>
+  <span
+    class="flex tooltip tooltip-right items-center gap-2"
+    data-tip="Nadelstärke"
+  >
+    <IconNadelstaerke class="w-4 h-4" />
+    {nadelstaerke} mm
+  </span>
+</Heading> 

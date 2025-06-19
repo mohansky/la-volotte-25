@@ -1,0 +1,59 @@
+---
+// components/Sections/About.astro
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import Paragraph from "../ui/Paragraph.astro";
+import Container from "../ui/Container.astro";
+import R2Image from "../ui/R2Image.astro";
+
+const siteData = await getCollection("siteData");
+const siteInfo = siteData[0].data;
+const site = siteInfo;
+---
+
+<section>
+  <Container width="marginxy">
+    <div class="space-y-15">
+      {
+        site.about.map((item: any) => (
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class=" lg:w-7/12">
+              {item.content.map((i: string) => (
+                <Paragraph class="indent-4 mb-1">{i}</Paragraph>
+              ))}
+            </div>
+            <div class=" lg:w-5/12  ">
+              <R2Image
+                src="/site/ybimladaen.jpg"
+                alt="La Volotte"
+                width={640}
+                height={360}
+                class="rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        ))
+      }
+      {
+        site.about1.map((item: any) => (
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class=" lg:w-4/12 ">
+              <R2Image
+                src={item.image}
+                alt="La Volotte"
+                width={405}
+                height={405}
+                class="rounded-lg shadow-lg"
+              />
+            </div>
+            <div class=" lg:w-8/12">
+              {item.content.map((i: string) => (
+                <Paragraph class="indent-4">{i}</Paragraph>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </Container>
+</section>

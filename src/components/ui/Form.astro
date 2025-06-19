@@ -1,0 +1,346 @@
+---
+import Button from "./Button.astro";
+
+// components/ui/Form.astro
+---
+
+<form
+  id="contact-form"
+  method="POST"
+  class="space-y-4"
+  >
+  <!-- HP Password field -->
+  <input
+    class="hidden"
+    type="text"
+    name="a_password"
+    tabindex="-1"
+    autocomplete="off"
+  />
+  
+  <!-- First Name and Last Name -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="form-control">
+      <input
+        type="text"
+        name="firstName"
+        placeholder="Vorname *"
+        class="input input-bordered input-primary w-full"
+      />
+      <label class="label">
+        <span class="label-text-alt text-error hidden" data-field="firstName"></span>
+      </label>
+    </div>
+    <div class="form-control">
+      <input
+        type="text"
+        name="lastName"
+        placeholder="Nachname (optional)"
+        class="input input-bordered input-primary w-full"
+      />
+      <label class="label">
+        <span class="label-text-alt text-error hidden" data-field="lastName"></span>
+      </label>
+    </div>
+  </div>
+  
+  <!-- Email -->
+  <div class="form-control">
+    <input
+      type="email"
+      name="email"
+      placeholder="Email Addresse *"
+      class="input input-bordered input-primary w-full"
+    />
+    <label class="label">
+      <span class="label-text-alt text-error hidden" data-field="email"></span>
+    </label>
+  </div>
+  
+  <!-- Phone -->
+  <div class="form-control">
+    <input
+      type="tel"
+      name="phone"
+      placeholder="Telefonnummer (optional)"
+      class="input input-bordered input-primary w-full"
+    />
+    <label class="label">
+      <span class="label-text-alt text-error hidden" data-field="phone"></span>
+    </label>
+  </div>
+  
+  <!-- Message -->
+  <div class="form-control">
+    <textarea
+      name="message"
+      class="textarea textarea-bordered textarea-primary w-full"
+      rows="5"
+      placeholder="Ihre Nachricht *"
+    ></textarea>
+    <label class="label" for="message">
+      <span class="label-text-alt text-error hidden" data-field="message"></span>
+    </label>
+  </div>
+  
+  <!-- Submit Button -->
+  <div class="submit-btn-container">
+    <Button title="Absenden" variant="primary" className="w-full submit-btn" type="submit" id="form-submit-btn">
+      <span class="btn-text">Absenden</span>
+      <span class="btn-loading hidden">
+        Wird gesendet
+        <span class="loading loading-dots loading-sm"></span>
+      </span>
+    </Button>
+  </div>
+  
+  <!-- General error alert -->
+  <div class="alert alert-error general-error hidden">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span class="error-text"></span>
+  </div>
+</form>
+
+<!-- Success Toast -->
+<div class="toast toast-bottom toast-end success-toast hidden z-30" id="contact-success-toast">
+  <div class="alert alert-success">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span>Nachricht erfolgreich gesendet. Vielen Dank!</span>
+  </div>
+</div>
+
+<script>
+  import { actions, isInputError } from "astro:actions";
+  
+  // Wait for DOM to be ready
+  function initContactForm() {
+    // console.log("initContactForm called");
+    // console.log("Document ready state:", document.readyState);
+    
+    const form = document.getElementById("contact-form") as HTMLFormElement;
+    const successToast = document.getElementById("contact-success-toast") as HTMLElement;
+    
+    // console.log("Form element found:", !!form);
+    // console.log("Success toast found:", !!successToast);
+    
+    if (!form) {
+      console.error("Contact form not found - this shouldn't happen based on our debugging");
+      return; // Don't throw error, just return
+    }
+    
+    // Updated selectors to match your actual HTML structure
+    const submitBtn = form.querySelector(".submit-btn") as HTMLButtonElement;
+    const btnText = form.querySelector(".btn-text") as HTMLElement;
+    const btnLoading = form.querySelector(".btn-loading") as HTMLElement;
+    const generalError = form.querySelector(".general-error") as HTMLElement;
+    const generalErrorText = generalError?.querySelector(".error-text") as HTMLElement;
+    
+    // More flexible error checking - only require essential elements
+    if (!form || !generalError || !generalErrorText) {
+      console.error("Essential form elements not found");
+      throw new Error("Essential form elements not found");
+    }
+    
+    // console.log("Contact form initialized successfully");
+    // console.log("Submit button found:", !!submitBtn);
+    // console.log("Button text found:", !!btnText);
+    // console.log("Button loading found:", !!btnLoading);
+    
+    // Clear all error messages
+    function clearErrors(): void {
+      const errorMessages = form.querySelectorAll("[data-field]") as NodeListOf<HTMLElement>;
+      errorMessages.forEach((error: HTMLElement) => {
+        error.textContent = "";
+        error.classList.add("hidden");
+      });
+      
+      const inputs = form.querySelectorAll(".input, .textarea") as NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
+      inputs.forEach((input: HTMLInputElement | HTMLTextAreaElement) => {
+        input.classList.remove("input-error", "textarea-error");
+        input.classList.add("input-primary", "textarea-primary");
+      });
+      
+      generalError.classList.add("hidden");
+    }
+    
+    // Show field-specific error
+    function showFieldError(fieldName: string, message: string): void {
+      const errorElement = form.querySelector(`[data-field="${fieldName}"]`) as HTMLElement;
+      const inputElement = form.querySelector(`[name="${fieldName}"]`) as HTMLInputElement | HTMLTextAreaElement;
+      
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.remove("hidden");
+      }
+      
+      if (inputElement) {
+        if (inputElement.tagName === "TEXTAREA") {
+          inputElement.classList.remove("textarea-primary");
+          inputElement.classList.add("textarea-error");
+        } else {
+          inputElement.classList.remove("input-primary");
+          inputElement.classList.add("input-error");
+        }
+      }
+    }
+    
+    // Show general error
+    function showGeneralError(message: string): void {
+      if (generalErrorText) {
+        generalErrorText.textContent = message;
+        generalError.classList.remove("hidden");
+      }
+    }
+    
+    // Set loading state - more defensive approach
+    function setLoading(loading: boolean): void {
+      if (submitBtn) {
+        if (loading) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add("btn-disabled");
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("btn-disabled");
+        }
+      }
+      
+      if (btnText) {
+        if (loading) {
+          btnText.classList.add("hidden");
+        } else {
+          btnText.classList.remove("hidden");
+        }
+      }
+      
+      if (btnLoading) {
+        if (loading) {
+          btnLoading.classList.remove("hidden");
+        } else {
+          btnLoading.classList.add("hidden");
+        }
+      }
+    }
+    
+    // Show success toast
+    function showSuccessToast(): void {
+      if (successToast) {
+        successToast.classList.remove("hidden");
+        setTimeout(() => {
+          successToast.classList.add("hidden");
+        }, 5000);
+      }
+    }
+    
+    // Form submission handler
+    form.addEventListener("submit", async (e: Event) => {
+      e.preventDefault();
+      console.log("Contact form submission started");
+      
+      clearErrors();
+      
+      // Check honeypot
+      const honeypot = form.querySelector('[name="a_password"]') as HTMLInputElement;
+      if (honeypot && honeypot.value.trim() !== "") {
+        showGeneralError("Ungültige Anfrage erkannt.");
+        return;
+      }
+      
+      setLoading(true);
+      
+      try {
+        const formData = new FormData(form);
+        console.log("Submitting:", Object.fromEntries(formData.entries()));
+        
+        // Use the correct action name that matches your actions/index.ts
+        const result = await actions.contactForm(formData);
+        console.log("Result:", result);
+        
+        if (result.error) {
+          console.error("Action returned error:", result.error);
+          
+          if (isInputError(result.error)) {
+            const fieldErrors = result.error.fields;
+            let hasFieldErrors = false;
+            
+            for (const [fieldName, fieldErrorArray] of Object.entries(fieldErrors)) {
+              if (fieldErrorArray && Array.isArray(fieldErrorArray) && fieldErrorArray.length > 0) {
+                showFieldError(fieldName, fieldErrorArray[0] as string);
+                hasFieldErrors = true;
+              }
+            }
+            
+            if (!hasFieldErrors && result.error.message) {
+              showGeneralError(result.error.message);
+            }
+          } else {
+            showGeneralError(result.error.message || "Ein Fehler ist aufgetreten.");
+          }
+        } else if (result.data) {
+          console.log("Success! data:", result.data);
+          form.reset();
+          showSuccessToast();
+        } else {
+          console.warn("Unexpected result format:", result);
+          showGeneralError("Unerwartete Antwort vom Server.");
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        showGeneralError("Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
+      } finally {
+        setLoading(false);
+      }
+    });
+  
+    // Clear errors on input
+    const inputs = form.querySelectorAll("input, textarea") as NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
+    inputs.forEach((input: HTMLInputElement | HTMLTextAreaElement) => {
+      input.addEventListener("input", () => {
+        const fieldName = input.getAttribute("name");
+        if (fieldName && fieldName !== 'a_password') {
+          const errorElement = form.querySelector(`[data-field="${fieldName}"]`) as HTMLElement;
+          if (errorElement && !errorElement.classList.contains("hidden")) {
+            errorElement.textContent = "";
+            errorElement.classList.add("hidden");
+            
+            if (input.tagName === "TEXTAREA") {
+              input.classList.remove("textarea-error");
+              input.classList.add("textarea-primary");
+            } else {
+              input.classList.remove("input-error");
+              input.classList.add("input-primary");
+            }
+          }
+        }
+      });
+    });
+  }
+  
+  // Initialize when DOM is ready - simplified approach
+  // console.log("Script loading, document ready state:", document.readyState);
+  
+  // Use a more reliable approach
+  function tryInit() {
+    const form = document.getElementById("contact-form");
+    if (form) {
+      // console.log("Form found, initializing...");
+      initContactForm();
+      return true;
+    }
+    return false;
+  }
+  
+  // Try immediately
+  if (!tryInit()) {
+    // If not found, wait for DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryInit);
+    } else {
+      // Try with a small delay
+      setTimeout(tryInit, 10);
+    }
+  }
+</script>
