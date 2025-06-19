@@ -26,6 +26,9 @@ export default defineConfig({
     ],
   },
   vite: {
+    define: {
+      "process.env": "import.meta.env",
+    },
     plugins: [tailwindcss()],
     ssr: {
       external: ["path", "url"],
@@ -87,5 +90,9 @@ export default defineConfig({
     react(),
     partytown(),
   ],
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    platformProxy: {
+      enabled: true,
+    },
+  }),
 });
