@@ -1,24 +1,15 @@
-name = "la-volotte"
+name = "la-volotte-mohansky"
 main = "./dist/_worker.js"
-compatibility_date = "2024-11-01"
+compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
 
 [build]
 command = "npm run build"
-
-[vars]
-NODE_ENV = "production"
-
+ 
 [[kv_namespaces]]
 binding = "SESSION"
-id = "a4f9a1d79bd049d4b5b81e3dea982163"
-
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "la-volotte"
-
-routes = [
-  { pattern = "la-volotte.de/*", zone_name = "la-volotte.de" },
-  { pattern = "www.la-volotte.de/*", zone_name = "la-volotte.de" },
-  { pattern = "la-volotte.mohansky.workers.dev/*", zone_name = "la-volotte.mohansky.workers.dev" } 
-]
+preview_id = "a4f9a1d79bd049d4b5b81e3dea982163"
+id = "f32a6a1042324a5ea4af821526b87206"
+ 
+[vars]
+NODE_ENV = "production"
