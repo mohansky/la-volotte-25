@@ -25,6 +25,35 @@ const site = siteInfo;
         style="display:none;visibility:hidden"></iframe></noscript
     >
     <!-- End Google Tag Manager (noscript) -->
+    <!-- // Polyfill for MessageChannel in Cloudflare Workers -->
+    <script is:inline>
+      if (typeof MessageChannel === "undefined") {
+        globalThis.MessageChannel = class MessageChannel {
+          constructor() {
+            this.port1 = {
+              onmessage: null,
+              postMessage: (data) => {
+                if (this.port2.onmessage) {
+                  setTimeout(() => this.port2.onmessage({ data }), 0);
+                }
+              },
+              start: () => {},
+              close: () => {},
+            };
+            this.port2 = {
+              onmessage: null,
+              postMessage: (data) => {
+                if (this.port1.onmessage) {
+                  setTimeout(() => this.port1.onmessage({ data }), 0);
+                }
+              },
+              start: () => {},
+              close: () => {},
+            };
+          }
+        };
+      }
+    </script>
     <!-- SnipcartSettings -->
     <script is:inline>
       window.SnipcartSettings = {
