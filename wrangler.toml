@@ -1,22 +1,31 @@
-name = "la-volotte-25"
-compatibility_date = "2024-01-01"
-pages_build_output_dir = "dist" 
+name = "la-volotte"
+main = "./dist/_worker.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
 
-[[r2_buckets]]
-binding = "R2_BUCKET"
-bucket_name = "la-volotte"
+# Build configuration
+[build]
+command = "npm run build"
 
+# Environment variables
+[vars]
+NODE_ENV = "production"
+
+# KV namespace for sessions
 [[kv_namespaces]]
 binding = "SESSION"
 id = "a4f9a1d79bd049d4b5b81e3dea982163"
 
-[env.production]
-vars = { }
-
-[[env.production.r2_buckets]]
+# R2 bucket binding
+[[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "la-volotte"
 
-[[env.production.kv_namespaces]]
-binding = "SESSION"
-id = "a4f9a1d79bd049d4b5b81e3dea982163"
+# Custom domain routes
+[[route]]
+pattern = "la-volotte.de/*"
+zone_name = "la-volotte.de"
+
+[[route]]
+pattern = "www.la-volotte.de/*"
+zone_name = "la-volotte.de"
