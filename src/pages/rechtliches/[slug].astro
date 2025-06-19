@@ -1,8 +1,7 @@
 ---
 export const prerender = true;
 // pages/rechtliches/[slug].astro
-import Address from "@/components/Sections/Address.astro";
-import CTA from "@/components/Sections/CTA.astro";
+import Address from "@/components/Sections/Address.astro"; 
 import Anchor from "@/components/ui/Anchor.astro";
 import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
 import Container from "@/components/ui/Container.astro";
@@ -59,5 +58,5 @@ const { Content } = await render(entry);
       }}
     />
   </Container>
-   <CTA/>
+    
 </Layout>
