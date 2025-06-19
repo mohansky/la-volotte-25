@@ -62,7 +62,7 @@ site:
 
   ctaTitle: La Volotte
   ctaText: Wir bieten eine große Auswahl an ausgesuchten, hochwertigen Naturgarnen aus verschiedenen Ländern!
-  ctaBg: /site/cta-bg.svg
+  ctaBg: /site/cta-bg.png
   ctaBtnText: Alle Produkte
   ctaBtnLink: /produkte
 
