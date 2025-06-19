@@ -26,16 +26,19 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     define: {
-      global: 'globalThis',
-      'process.env.NODE_ENV': '"production"'
+      global: "globalThis",
+      "process.env.NODE_ENV": '"production"',
     },
     ssr: {
-      external: ["path", "url", "react", "react-dom"],
+      external: ["path", "url"],
       noExternal: ["slick-carousel", "jquery"],
     },
-    optimizeDeps: {
-      exclude: ["react", "react-dom"]
-    }
+    resolve: {
+      alias: {
+        // Fix for MessageChannel issue in Workers
+        "react-dom/server": "react-dom/server.edge",
+      },
+    },
   },
   env: {
     schema: {
@@ -89,14 +92,13 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes("/rechtliches/"),
     }),
-    react({
-      include: ['**/react/*'],
-      experimentalReactChildren: false,
-    }),
+    react(),
     partytown(),
   ],
   adapter: cloudflare({
     imageService: "compile",
-    mode: "directory",
+    platformProxy: {
+      enabled: true,
+    },
   }),
 });
