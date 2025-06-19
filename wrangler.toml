@@ -1,7 +1,10 @@
 name = "la-volotte"
 main = "./dist/_worker.js"
 compatibility_date = "2024-11-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat", "experimental"]
+
+[build]
+command = "npm run build"
 
 [env.production]
 routes = [
