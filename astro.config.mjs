@@ -26,8 +26,8 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     define: {
-      global: "globalThis",
-      "process.env.NODE_ENV": '"production"',
+      global: 'globalThis',
+      'process.env.NODE_ENV': '"production"'
     },
     ssr: {
       external: ["path", "url"],
@@ -36,9 +36,17 @@ export default defineConfig({
     resolve: {
       alias: {
         // Fix for MessageChannel issue in Workers
-        "react-dom/server": "react-dom/server.edge",
-      },
+        'react-dom/server': 'react-dom/server.edge'
+      }
     },
+    build: {
+      assetsInlineLimit: 0, // Don't inline assets
+      rollupOptions: {
+        output: {
+          assetFileNames: '_astro/[name].[hash][extname]'
+        }
+      }
+    }
   },
   env: {
     schema: {
@@ -92,13 +100,13 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes("/rechtliches/"),
     }),
-    react(),
+    react({
+      experimentalReactChildren: true,
+    }),
     partytown(),
   ],
   adapter: cloudflare({
     imageService: "compile",
-    platformProxy: {
-      enabled: true,
-    },
+    mode: "advanced", // Use advanced mode for better asset handling
   }),
 });
