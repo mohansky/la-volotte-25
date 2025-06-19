@@ -27,7 +27,7 @@ export default defineConfig({
   },
   vite: {
     define: {
-      "process.env": "import.meta.env",
+      'process.env': 'import.meta.env'
     },
     plugins: [tailwindcss()],
     ssr: {
@@ -46,38 +46,38 @@ export default defineConfig({
       PUBLIC_R2_BUCKET_URL: envField.string({
         context: "client",
         access: "public",
-        optional: false,
+        optional: true,
       }),
       R2_ACCOUNT_ID: envField.string({
         context: "server",
         access: "secret",
-        optional: false,
+        optional: true,
       }),
       R2_ACCESS_KEY_ID: envField.string({
         context: "server",
         access: "secret",
-        optional: false,
+        optional: true,
       }),
       R2_SECRET_ACCESS_KEY: envField.string({
         context: "server",
         access: "secret",
-        optional: false,
+        optional: true,
       }),
       R2_BUCKET_NAME: envField.string({
         context: "server",
         access: "secret",
-        optional: false,
+        optional: true,
       }),
       R2_ENDPOINT: envField.string({
         context: "server",
         access: "public",
         startsWith: "https://",
-        optional: false,
+        optional: true,
       }),
       NODE_ENV: envField.string({
         context: "server",
         access: "public",
-        optional: false,
+        optional: true,
       }),
     },
   },
