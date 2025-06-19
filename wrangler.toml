@@ -1,0 +1,25 @@
+name = "la-volotte"
+main = "./dist/_worker.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+routes = [
+  { pattern = "la-volotte.de/*", zone_name = "la-volotte.de" },
+  { pattern = "www.la-volotte.de/*", zone_name = "la-volotte.de" }
+]
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "a4f9a1d79bd049d4b5b81e3dea982163"
+preview_id = "a4f9a1d79bd049d4b5b81e3dea982163"
+
+[vars]
+PUBLIC_R2_BUCKET_URL = "https://pub-11cf4ccbbccc4a3db1a72d128484c712.r2.dev"
+R2_ENDPOINT = "https://83d4d6746ea272718c8c962ecf89a8cb.r2.cloudflarestorage.com"
+NODE_ENV = "production"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "la-volotte"
+preview_bucket_name = "la-volotte"
