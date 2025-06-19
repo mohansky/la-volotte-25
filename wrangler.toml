@@ -21,11 +21,8 @@ id = "a4f9a1d79bd049d4b5b81e3dea982163"
 binding = "R2_BUCKET"
 bucket_name = "la-volotte"
 
-# Custom domain routes
-[[route]]
-pattern = "la-volotte.de/*"
-zone_name = "la-volotte.de"
-
-[[route]]
-pattern = "www.la-volotte.de/*"
-zone_name = "la-volotte.de"
+# Use routes instead of route for multiple routes
+routes = [
+  { pattern = "la-volotte.de/*", zone_name = "la-volotte.de" },
+  { pattern = "www.la-volotte.de/*", zone_name = "la-volotte.de" }
+]
