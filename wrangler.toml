@@ -13,6 +13,3 @@ id = "f32a6a1042324a5ea4af821526b87206"
  
 [vars]
 NODE_ENV = "production"
-
-[limits]
-cpu_ms = 50000
