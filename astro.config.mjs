@@ -26,11 +26,12 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     define: {
-      'process.env': 'import.meta.env'
+      global: "globalThis",
+      "process.env.NODE_ENV": '"production"',
     },
     ssr: {
-      external: ["path", "url"],
-      noExternal: ["slick-carousel", "jquery"],
+      external: [],
+      noExternal: true,
     },
   },
   env: {
@@ -89,8 +90,6 @@ export default defineConfig({
     partytown(),
   ],
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-    },
+    imageService: "compile",
   }),
 });
