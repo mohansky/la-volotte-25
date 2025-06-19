@@ -1,33 +1,43 @@
 ---
 // components/Sections/CTA.astro
 import Heading from "../ui/Heading.astro";
-import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import Button from "../ui/Button.astro";
 import R2Image from "../ui/R2Image.astro";
+
 const siteData = await getCollection("siteData");
-const siteInfo = siteData[0].data;
+const siteInfo = siteData[0]?.data;
+
+// Add fallback values if data is missing
+const ctaBg = siteInfo?.ctaBg || '/fallback-cta-bg.png';
+const ctaTitle = siteInfo?.ctaTitle || 'Default Title';
+const ctaText = siteInfo?.ctaText || 'Default text';
+const ctaBtnLink = siteInfo?.ctaBtnLink || '#';
+const ctaBtnText = siteInfo?.ctaBtnText || 'Learn More';
 ---
-<div class="relative  h-[30vh] overflow-hidden">
-  <R2Image
-    src={siteInfo.ctaBg}
-    alt={siteInfo.ctaTitle}
-    class="object-cover opacity-80 w-full h-full"
-    width={1920}
-    height={1080}
-  />
+
+<div class="relative h-[30vh] overflow-hidden">
+  {siteInfo?.ctaBg && (
+    <R2Image
+      src={ctaBg}
+      alt={ctaTitle}
+      class="object-cover opacity-80 w-full h-full"
+      width={1920}
+      height={1080}
+    />
+  )}
   <div class="absolute top-0 left-0 w-full h-full bg-gradient-primary opacity-90"></div>
   <div class="absolute top-1/2 left-1/3 w-3/4 -translate-x-1/3 -translate-y-1/2 text-neutral-content">
     <div class="max-w-5xl mix-blend-difference">
-      <Heading size="xl" fontweight="bold" class="mb-2"
-        >{siteInfo.ctaTitle}</Heading
-      >
-      <Heading size="md" fontweight="light" class="mb-2">
-        {siteInfo.ctaText}
+      <Heading size="xl" fontweight="bold" class="mb-2">
+        {ctaTitle}
       </Heading>
-      <Button href={siteInfo.ctaBtnLink} variant="gradient" title={siteInfo.ctaBtnText}>
-        {siteInfo.ctaBtnText}</Button
-      >
+      <Heading size="md" fontweight="light" class="mb-2">
+        {ctaText}
+      </Heading>
+      <Button href={ctaBtnLink} variant="gradient" title={ctaBtnText}>
+        {ctaBtnText}
+      </Button>
     </div>
   </div>
 </div>
