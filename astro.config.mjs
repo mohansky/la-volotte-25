@@ -26,13 +26,16 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     define: {
-      global: "globalThis",
-      "process.env.NODE_ENV": '"production"',
+      global: 'globalThis',
+      'process.env.NODE_ENV': '"production"'
     },
     ssr: {
-      external: [],
-      noExternal: true,
+      external: ["path", "url", "react", "react-dom"],
+      noExternal: ["slick-carousel", "jquery"],
     },
+    optimizeDeps: {
+      exclude: ["react", "react-dom"]
+    }
   },
   env: {
     schema: {
@@ -86,10 +89,14 @@ export default defineConfig({
     sitemap({
       filter: (page) => !page.includes("/rechtliches/"),
     }),
-    react(),
+    react({
+      include: ['**/react/*'],
+      experimentalReactChildren: false,
+    }),
     partytown(),
   ],
   adapter: cloudflare({
     imageService: "compile",
+    mode: "directory",
   }),
 });
