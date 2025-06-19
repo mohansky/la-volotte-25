@@ -1,14 +1,12 @@
 // @ts-check
 import { defineConfig, envField } from "astro/config";
-import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
-
 import cloudflare from "@astrojs/cloudflare";
-
 import partytown from "@astrojs/partytown";
+import tailwind from "@astrojs/tailwind";
 
 // https://astro.build/config
 export default defineConfig({
@@ -29,7 +27,6 @@ export default defineConfig({
     define: {
       'process.env': 'import.meta.env'
     },
-    plugins: [tailwindcss()],
     ssr: {
       external: ["path", "url"],
       noExternal: ["slick-carousel", "jquery"],
@@ -89,6 +86,9 @@ export default defineConfig({
     }),
     react(),
     partytown(),
+    tailwind({
+      applyBaseStyles: false, // We'll handle this in our CSS
+    }),
   ],
   adapter: cloudflare({
     platformProxy: {
