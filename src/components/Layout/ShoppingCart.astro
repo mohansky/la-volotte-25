@@ -1,0 +1,20 @@
+---
+// components/Layout/ShoppingCart.astro
+import IconTiShoppingCart from "../Icons/IconTiShoppingCart.astro";
+---
+
+<div class="mr-4 flex flex-col justify-start items-center gap-0">
+  <div class="indicator">
+    <span
+      class="indicator-item badge badge-primary badge-soft badge-xs rounded-full snipcart-items-count"
+    ></span>
+    <button class="snipcart-checkout btn btn-ghost btn-circle">
+      <IconTiShoppingCart
+        class="w-5 h-5 hover:fill-primary transition-all duration-300 ease-in-out"
+      />
+    </button>
+  </div>
+  <div class="badge badge-xs">
+    (<span class="snipcart-total-price"></span>)
+  </div>
+</div>

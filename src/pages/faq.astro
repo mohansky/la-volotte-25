@@ -1,0 +1,32 @@
+---
+// pages/faq.astro
+import CTA from "@/components/Sections/CTA.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Container from "@/components/ui/Container.astro";
+import FAQAccordian from "@/components/ui/FAQAccordian.astro";
+import Form from "@/components/ui/Form.astro";
+import Heading from "@/components/ui/Heading.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const siteData = await getCollection("siteData");
+const siteInfo = siteData[0].data;
+const site = siteInfo;
+---
+
+<Layout>
+  <Container width="marginxy">
+    <Breadcrumbs />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <Heading class="mb-5">Häufig gestellte Fragen</Heading>
+        <FAQAccordian faqItem={site.faqItem} />
+      </div>
+      <div>
+        <Heading class="mb-5">Bitte nehmen Sie Kontakt mit uns auf.</Heading>
+        <Form />
+      </div>
+    </div>
+  </Container>
+   <CTA/>
+</Layout>

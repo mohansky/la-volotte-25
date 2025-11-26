@@ -1,0 +1,17 @@
+---
+// components/Layout/ThemeToggle.astro
+import IconMoon from "../Icons/IconMoon.astro";
+import IconSun from "../Icons/IconSun.astro";
+---
+
+<label class="swap swap-rotate w-full lg:w-fit" for="theme-controller">
+  <input
+    type="checkbox"
+    class="toggle theme-controller hidden"
+    data-toggle-theme="cupcake,forest"
+    data-act-class="ACTIVECLASS"
+    id="theme-controller"
+  />
+  <IconMoon />
+  <IconSun />
+</label>

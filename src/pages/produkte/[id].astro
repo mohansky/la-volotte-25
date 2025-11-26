@@ -1,0 +1,200 @@
+---
+// pages/produkte/[id].astro
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumbs from "@/components/ui/Breadcrumbs.astro";
+import Container from "@/components/ui/Container.astro";
+import Heading from "@/components/ui/Heading.astro";
+import Paragraph from "@/components/ui/Paragraph.astro";
+import AddtoCartBtn from "@/components/Product/AddtoCartBtn.astro";
+import Farbenhinweis from "@/components/Product/Farbenhinweis.astro";
+import ImageColorGallery from "@/components/Product/ImageColorGallery.astro";
+import ImageFeatureSlider from "@/components/Product/ImageFeatureSlider.astro";
+
+import type { GetStaticPaths } from "astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+import IconWeight from "@/components/Icons/IconWeight.astro";
+import IconNadelstaerke from "@/components/Icons/IconNadelstaerke.astro";
+import IconRuler from "@/components/Icons/IconRuler.astro";
+import CTA from "@/components/Sections/CTA.astro";
+import Button from "@/components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+import IconTiAngleDoubleLeft from "@/components/Icons/IconTiAngleDoubleLeft.astro";
+
+import { getEntry, render } from "astro:content";
+
+// 1. Get the slug from the incoming server request
+const { id } = Astro.params;
+if (id === undefined) {
+  return Astro.redirect("/404");
+}
+
+// 2. Filter out non-product requests
+const invalidPatterns = [
+  /\.(js|css|json|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/i,
+  /^(config|api|admin|_|\.)/,
+  /^(robots\.txt|sitemap\.xml|favicon\.ico|config\.js)$/i
+];
+
+if (invalidPatterns.some(pattern => pattern.test(id))) {
+  return new Response(null, { status: 404 });
+}
+
+const products = await getCollection("products");
+const product = products.find(p => p.data.id === id);
+ 
+if (!product) {
+  return Astro.redirect("/404");
+}
+
+const { data } = product;
+
+// Format currency
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(amount);
+};
+---
+
+<script>
+(function() {
+  function initProductPageNavigation() {
+    const backButton = document.getElementById('backToProducts') as HTMLAnchorElement;
+    if (!backButton) return;
+    
+    function getPreservedFilters(): string | null {
+      // Check if we have filters stored in sessionStorage
+      const storedFilters = sessionStorage.getItem('productFilters');
+      if (storedFilters) {
+        return storedFilters;
+      }
+
+      // Fallback: check if document.referrer contains filters
+      if (document.referrer && document.referrer.includes('/produkte')) {
+        try {
+          const referrerUrl = new URL(document.referrer);
+          return referrerUrl.search.substring(1); // Remove the '?' prefix
+        } catch (e) {
+          console.warn('Could not parse referrer URL:', e);
+        }
+      }
+
+      return null;
+    }
+
+    function updateBackButtonHref(): void {
+      const preservedFilters = getPreservedFilters();
+      const href = preservedFilters ? `/produkte?${preservedFilters}` : '/produkte';
+      backButton.href = href;
+    }
+
+    function navigateBack(): void {
+      const preservedFilters = getPreservedFilters();
+      
+      if (preservedFilters) {
+        // Navigate with preserved filters
+        window.location.href = `/produkte?${preservedFilters}`;
+      } else if (window.history.length > 1 && document.referrer.includes('/produkte')) {
+        // Use browser back if we came from products page
+        window.history.back();
+      } else {
+        // Fallback to products page
+        window.location.href = '/produkte';
+      }
+    }
+
+    // Update back button href with preserved filters
+    updateBackButtonHref();
+    
+    // Handle dynamic navigation
+    backButton.addEventListener('click', (e: Event) => {
+      e.preventDefault();
+      navigateBack();
+    });
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', initProductPageNavigation);
+
+  // Store current page info for potential future navigation
+  sessionStorage.setItem('lastProductPage', window.location.pathname);
+})();
+</script>
+
+<Layout>
+  <Container width="marginxy" class="pt-32"> 
+    <Button
+      id="backToProducts"
+      href="/produkte"
+      variant="circle"
+      size="icon"
+      className="fixed top-26 right-4 z-10 shadow-lg"
+      title="Zurück zu Produkten"
+    >
+      <IconTiAngleDoubleLeft class="w-6 h-6" />
+    </Button>
+    <Breadcrumbs />
+    <div class="card md:card-side bg-base-100 shadow-none rounded-lg">
+      <figure class="md:w-1/3">
+        <ImageFeatureSlider subDirectory={data.featureImageSlider} />
+      </figure>
+
+      <div class="card-body space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center gap-10 md:gap-20">
+          <div>
+            <Heading size="lg" fontweight="bold">{data.name}</Heading>
+            <Heading size="xs" fontweight="light">{data.marke}</Heading>
+          </div>
+          <AddtoCartBtn product={data} fullWidth={false} />
+        </div>
+        <div class="mb-4">
+          <span class="flex place-items-center gap-4">
+            <Heading size="lg">{formatCurrency(data.preis)}</Heading>
+            {
+              data.preisStatt > 0 && (
+                <Heading class="text-center" fontweight="thin" size="xs">
+                  <s>{formatCurrency(data.preisStatt)} </s>
+                </Heading>
+              )
+            }
+          </span>
+          <small>inkl. MwSt. zzgl. Versandkosten* </small>
+        </div>
+        <div class="space-y-4">
+          <Heading
+            size="md"
+            fontweight="normal"
+            class="w-fit tooltip tooltip-left flex items-center gap-4"
+            data-tip="Menge"><IconWeight class="w-4 h-4" />{data.menge}</Heading
+          >
+          <Heading
+            size="md"
+            fontweight="normal"
+            class="w-fit tooltip tooltip-left flex items-center gap-4"
+            data-tip="Nadelstärke"
+            ><IconNadelstaerke class="w-4 h-4" />{data.nadelstaerke} mm</Heading
+          >
+          <Heading
+            size="md"
+            fontweight="normal"
+            class="w-fit tooltip tooltip-left flex items-center gap-4"
+            data-tip="Lauflänge"
+            ><IconRuler class="w-4 h-4" />{data.lauflaenge}</Heading
+          >
+        </div>
+        <div>
+          <Heading> Kurzbeschreibung </Heading>
+          <Heading size="xs" fontweight="normal">
+            {data.beschreibung}
+          </Heading>
+        </div>
+      </div>
+    </div>
+    <div class="">
+      <Farbenhinweis />
+      <ImageColorGallery subDirectory={data.farbenFotos} />
+    </div>
+  </Container>
+  <CTA />
+</Layout>

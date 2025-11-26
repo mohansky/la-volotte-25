@@ -1,0 +1,41 @@
+---
+// components/Sections/RandomProducts.astro
+import { getCollection } from "astro:content";
+import Heading from "../ui/Heading.astro";
+import ProductCard from "../Product/ProductCard.astro";
+import Container from "../ui/Container.astro";
+import ProductGrid from "../Product/ProductGrid.astro";
+
+const allProducts = await getCollection("products");
+const publishedProducts = allProducts
+  .filter((product) => product.data.published === true)
+  .sort((a, b) => a.id.localeCompare(b.id));
+
+function getRandomProducts(products: any[], count: number) {
+  const shuffled = [...products].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
+const randomProducts = getRandomProducts(publishedProducts, 6);
+---
+
+<Container>
+  <Heading
+    size="xxl"
+    fontweight="black"
+    fontstyle="sans"
+    class="capitalize mb-6"
+  >
+    Produkte
+  </Heading>
+
+  <ProductGrid id="productsGrid">
+    {
+      randomProducts.map((product) => (
+        <div class="product-card">
+          <ProductCard product={product.data} />
+        </div>
+      ))
+    }
+  </ProductGrid>
+</Container>

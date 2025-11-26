@@ -1,0 +1,143 @@
+---
+// components/ui/HeadingMD.astro
+import type { HTMLAttributes } from "astro/types";
+import { cn } from "@/lib/utils";
+
+type VariantType =
+  | "default"
+  | "sectiontitle"
+  | "sectiontitlehalf"
+  | "sectiontitlesm";
+
+type SizeType =
+  | "xxxxl"  
+  | "xxxl"
+  | "xxl"
+  | "xl"
+  | "lg"
+  | "md"
+  | "sm"
+
+type FontWeightType =
+  | "black"
+  | "bold"
+  | "semibold"
+  | "normal"
+  | "medium"
+  | "light"
+  | "extralight"
+  | "thin";
+
+type FontStyleType = "sans" | "serif";
+type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+
+interface Props
+  extends HTMLAttributes<"h1" | "h2" | "h3" | "h4" | "h5" | "h6"> {
+  variant?: VariantType;
+  size?: SizeType;
+  fontweight?: FontWeightType;
+  fontstyle?: FontStyleType;
+  as?: HeadingTag;
+  class?: string;
+}
+
+// Define default styles for each heading tag
+const headingDefaults: Record<HeadingTag, {
+  size: SizeType;
+  fontweight: FontWeightType;
+  variant: VariantType;
+}> = {
+  h1: { size: "xxxl", fontweight: "black", variant: "default" },
+  h2: { size: "xxl", fontweight: "bold", variant: "default" },
+  h3: { size: "xl", fontweight: "bold", variant: "default" },
+  h4: { size: "lg", fontweight: "semibold", variant: "default" },
+  h5: { size: "md", fontweight: "semibold", variant: "default" },
+  h6: { size: "sm", fontweight: "thin", variant: "default" },
+};
+
+const {
+  as,
+  variant,
+  size,
+  fontweight,
+  fontstyle = "serif",
+  class: className,
+  ...rest
+} = Astro.props;
+
+// Auto-determine tag based on size/variant or use explicit 'as' prop
+function determineTag(): HeadingTag {
+  if (as) return as;
+  
+  // If size is provided, map it to appropriate tag
+  if (size) {
+    const sizeToTagMap: Partial<Record<SizeType, HeadingTag>> = {
+      xxxxl: "h1",
+      xxxl: "h1", 
+      xxl: "h2",
+      xl: "h3",
+      lg: "h4",
+      md: "h5",
+      sm: "h6",
+    };
+    return sizeToTagMap[size] || "h2";
+  }
+  
+  // Default to h2 if nothing specified
+  return "h2";
+}
+
+const Tag = determineTag();
+
+// Apply tag-based defaults, but allow props to override
+const defaults = headingDefaults[Tag];
+const finalVariant = variant ?? defaults.variant;
+const finalSize = size ?? defaults.size;
+const finalFontweight = fontweight ?? defaults.fontweight;
+
+const variants: Record<VariantType, string> = {
+  default: " ",
+  sectiontitle: "text-center",
+  sectiontitlehalf: "mb-14 ",
+  sectiontitlesm: "bg-primary/20 text-foreground shadow",
+};
+
+const sizes: Record<SizeType, string> = {
+  xxxxl: "text-3xl md:text-4xl mb-10",
+  xxxl: "text-2xl md:text-3xl mb-8 mt-10",
+  xxl: "text-xl md:text-2xl mb-5 mt-8",
+  xl: "text-lg md:text-xl mb-3 mt-6",
+  lg: "text-base md:text-lg mb-2 mt-4",
+  md: "text-sm md:text-base mb-1 mt-2",
+  sm: "text-xs md:text-sm mb-0.5 mt-1",
+};
+
+const fontweights: Record<FontWeightType, string> = {
+  black: "font-black",
+  bold: "font-bold",
+  semibold: "font-semibold",
+  normal: "font-normal",
+  medium: "font-medium",
+  light: "font-light",
+  extralight: "font-extralight",
+  thin: "font-thin",
+};
+
+const fontstyles: Record<FontStyleType, string> = {
+  sans: "font-quicksand",
+  serif: "font-quicksand",
+};
+
+const classes = cn(
+  " ",
+  variants[finalVariant],
+  sizes[finalSize],
+  fontweights[finalFontweight],
+  fontstyles[fontstyle],
+  className
+);
+---
+
+<Tag class={classes} {...rest}>
+  <slot />
+</Tag>

@@ -1,0 +1,72 @@
+---
+// components/Product/ProductCard.astro
+import ProductCardImage from "./ProductCardImage.astro";
+import ProductCardHead from "./ProductCardHead.astro";
+import ProductCardSpecs from "./ProductCardSpecs.astro";
+import ProductCardPrice from "./ProductCardPrice.astro";
+import AddtoaCartBtn from "./AddtoCartBtn.astro";
+import Button from "../ui/Button.astro";
+
+interface Product {
+  slug?: string;
+  id: string;
+  name: string;
+  marke?: string;
+  description?: string;
+  featureImage?: string;
+  preis: number;
+  preisStatt: number;
+  menge?: string;
+  nadelstaerke?: string;
+  material?: string;
+  lauflaenge?: string;
+  featureImageSlider?: string;
+  farbenFotos?: string;
+  published?: boolean;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+---
+
+<div class="card shadow-none h-full flex flex-col">
+  <a href={`/produkte/${product.id}`} title={product.name}>
+    <figure class="card-image">
+      <ProductCardImage subDirectory={product.featureImage} />
+    </figure>
+  </a>
+  <div class="card-body gap-1 md:gap-2 items-center text-center p-1 flex flex-col flex-grow">
+    <ProductCardHead product={product} />
+    <ProductCardSpecs product={product} />
+    <ProductCardPrice product={product} />
+
+    <!-- Mobile Buttons -->
+    <div class="hidden md:flex card-actions gap-2 justify-between mt-auto">
+      <Button
+        href={`/produkte/${product.id}`}
+        variant="outline"
+        className="w-full md:w-auto"
+        title={product.name}
+      >
+        Zum Produkt
+      </Button>
+      <AddtoaCartBtn product={product} />
+    </div>
+    <!-- Desktop Buttons -->
+    <div class="flex md:hidden card-actions gap-1 justify-between mt-auto">
+      <Button
+        href={`/produkte/${product.id}`}
+        variant="outline"
+        className="w-full md:w-auto"
+        title={product.name}
+        size="sm"
+      >
+        Zum Produkt
+      </Button>
+      <AddtoaCartBtn size="sm" product={product} />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+---
+// components/CookieConsent.astro
+import 'klaro/dist/klaro.css';
+import '@/styles/klaro-custom.css';
+---
+
+<script is:inline>
+  // IMPORTANT: Define window.klaroConfig BEFORE Klaro loads
+  // This prevents Klaro from trying to fetch /config.js
+  window.klaroConfig = {
+    noAutoLoad: true,
+    elementID: 'klaro',
+    storageMethod: 'cookie',
+    cookieName: 'klaro',
+    cookieExpiresAfterDays: 365,
+    default: false,
+    mustConsent: false,
+    acceptAll: true,
+    hideDeclineAll: false,
+    hideLearnMore: false,
+    noticeAsModal: false,
+    disablePoweredBy: false,
+    htmlTexts: true,
+    lang: 'de',
+    translations: {
+      de: {
+        consentModal: {
+          title: 'Cookie-Einstellungen',
+          description: 'Wir verwenden Cookies und andere Tracking-Technologien, um Ihr Surferlebnis auf unserer Website zu verbessern, personalisierte Inhalte und gezielte Anzeigen anzuzeigen, unseren Website-Traffic zu analysieren und zu verstehen, woher unsere Besucher kommen.',
+        },
+        consentNotice: {
+          title: 'Cookie-Einstellungen',
+          description: 'Wir verwenden Cookies und andere Tracking-Technologien, um Ihr Surferlebnis auf unserer Website zu verbessern. {learnMore}',
+          learnMore: 'Cookie-Einstellungen verwalten',
+        },
+        googleTagManager: {
+          description: 'Google Tag Manager ermöglicht es uns, verschiedene Tracking- und Marketing-Tools über eine zentrale Plattform zu verwalten.',
+        },
+        purposes: {
+          analytics: 'Analyse',
+          marketing: 'Marketing',
+          functional: 'Funktional',
+        },
+      },
+    },
+    services: [
+      {
+        name: 'google-tag-manager',
+        default: false,
+        title: 'Google Tag Manager',
+        purposes: ['analytics', 'marketing'],
+        cookies: [
+          '_ga',
+          '_gid',
+          '_gat',
+          '_gcl_au',
+          'ga-disable',
+        ],
+        required: false,
+        optOut: false,
+        onlyOnce: true,
+      },
+      {
+        name: 'snipcart',
+        title: 'Snipcart (E-Commerce)',
+        purposes: ['functional'],
+        required: true,
+        default: true,
+        cookies: ['snipcart'],
+      },
+    ],
+  };
+</script>
+
+<script>
+  // Now import Klaro - it will find window.klaroConfig and use it
+  import 'klaro';
+</script>

@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: lavolotte --default, lavolotte --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "lavolotte";
+  default: true;
+  prefersdark: true;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0.003 247.858);
+  --color-base-300: oklch(92% 0.013 255.508);
+  --color-base-content: oklch(37% 0.034 259.733);
+  --color-primary: oklch(0.6894 0.197 136.76);
+  --color-primary-content: oklch(39% 0.095 152.535);
+  --color-secondary: oklch(66% 0.295 322.15);
+  --color-secondary-content: oklch(95% 0.037 318.852);
+  --color-accent: oklch(92% 0.12 95.746);
+  --color-accent-content: oklch(47% 0.137 46.201);
+  --color-neutral: oklch(37% 0.013 285.805);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(95% 0.026 236.824);
+  --color-success: oklch(70% 0.14 182.503);
+  --color-success-content: oklch(95% 0.051 180.801);
+  --color-warning: oklch(79% 0.184 86.047);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(94% 0.03 12.58);
+  --gradient-primary: linear-gradient(
+    135deg,
+    oklch(0.6894 0.197 136.76),
+    oklch(0.794 0.1883 129.17)
+  );
+  --gradient-secondary: linear-gradient(
+    135deg,
+    oklch(66% 0.295 322.15),
+    oklch(79% 0.209 151.711)
+  );
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "forest";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(20.84% 0.008 17.911);
+  --color-base-200: oklch(18.522% 0.007 17.911);
+  --color-base-300: oklch(16.203% 0.007 17.911);
+  --color-base-content: oklch(83.768% 0.001 17.911);
+  --color-primary: oklch(68.628% 0.185 148.958);
+  --color-primary-content: oklch(0% 0 0);
+  --color-secondary: oklch(69.776% 0.135 168.327);
+  --color-secondary-content: oklch(13.955% 0.027 168.327);
+  --color-accent: oklch(70.628% 0.119 185.713);
+  --color-accent-content: oklch(14.125% 0.023 185.713);
+  --color-neutral: oklch(30.698% 0.039 171.364);
+  --color-neutral-content: oklch(86.139% 0.007 171.364);
+  --color-info: oklch(72.06% 0.191 231.6);
+  --color-info-content: oklch(0% 0 0);
+  --color-success: oklch(64.8% 0.15 160);
+  --color-success-content: oklch(0% 0 0);
+  --color-warning: oklch(84.71% 0.199 83.87);
+  --color-warning-content: oklch(0% 0 0);
+  --color-error: oklch(71.76% 0.221 22.18);
+  --color-error-content: oklch(0% 0 0);
+  --radius-selector: 1rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+/* quicksand-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: "Quicksand";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/quicksand-v36-latin-regular.woff2") format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+@theme {
+  --font-quicksand: "Quicksand", "sans-serif";
+}
+
+::selection {
+  background: #71dc2a;
+  color: #fff;
+}
+
+.password-input {
+  display: none !important;
+  visibility: hidden;
+}
+
+.snipcart-modal {
+  z-index: 100;
+  margin-top: 90px;
+}
+
+.snipcart-test-banner__message {
+  display: none;
+  border-top: none;
+}
+
+.bg-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.btn-gradient-primary {
+  background: var(--gradient-primary);
+  border: 1px solid var(--color-primary);
+  color: #fff;
+}
+
+.btn-gradient-primary:hover {
+  opacity: 80%;
+}
+
+.btn-gradient-primary-outline {
+  border: 1px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.btn-gradient-primary-outline:hover {
+  background: var(--gradient-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}

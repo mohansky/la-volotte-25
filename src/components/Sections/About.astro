@@ -1,0 +1,81 @@
+---
+// components/Sections/About.astro
+import Paragraph from "../ui/Paragraph.astro";
+import Container from "../ui/Container.astro";
+import R2Image from "../ui/R2Image.astro";
+---
+
+<section>
+  <Container width="marginxy">
+    <div class="space-y-6">
+      <div class="float-right ml-6 mb-6 w-full lg:w-5/12">
+        <R2Image
+          src="/site/ybimladaen.jpg"
+          alt="La Volotte"
+          width={640}
+          height={360}
+          class="rounded-lg shadow-lg"
+        />
+      </div>
+
+      <Paragraph class="indent-4">
+        Die bezaubernde, alte Ladentür öffnet sich zu 'La Volotte', und ein
+        charmantes, kleines Geschäft mit einer großen Auswahl an ausgesuchten,
+        hochwertigen Naturgarnen aus verschiedenen Ländern lädt die Kundschaft
+        zum Schwelgen und Finden ein!
+      </Paragraph>
+
+      <Paragraph>
+        Barbara Münz und ihr Team bieten mit Freude und Leidenschaft neben den
+        schönen Garnen und Stricknadeln in diversen Workshops gerne auch
+        Anleitung und kompetente Beratung an. Regelmäßig am ersten Samstag im
+        Monat findet in gemütlicher Runde bei unserem beliebten Strickcafé ein
+        reger Austausch statt!
+      </Paragraph>
+
+      <Paragraph>
+        Wenn Sie nicht selbst stricken, können Sie aus unseren Garnen auch
+        individuelle Anfertigungen in Auftrag geben, sprechen Sie uns an!
+      </Paragraph>
+
+      <div class="float-left mr-6 mb-6 w-full lg:w-5/12">
+        <R2Image
+          src="/site/street.jpg"
+          alt="La Volotte"
+          width={405}
+          height={405}
+          class="rounded-lg shadow-lg"
+        />
+      </div>
+
+      <Paragraph class="indent-4">
+        Im hinteren Raum befindet sich unser Atelier, wo das Strickcafe
+        stattfindet und mit Zeit und Muße in Strickbüchern geschmökert werden
+        kann. Hier findet sich Inspiration in Hülle und Fülle!
+      </Paragraph>
+
+      <Paragraph>
+        Barbara Münz hat in vielen Workshops die alte Handwerkstechnik des
+        Filzens weitergegeben, viele Jahre auf verschiedenen
+        Kunsthandwerkermärkten verkauft und begleitet nun Frauen und Kinder in
+        Indien beim Erlernen dieser Technik und unterstützt so deren
+        Möglichkeiten, für den eigenen Lebensunterhalt zu sorgen. Neben
+        Filzworkshops hat sie an verschiedenen Orten auch Stricken und Häkeln
+        unterrichtet. Ganz aktuell stricken verschiedene Frauengruppen Mützen,
+        Westen, Schals und Socken für Schulen in Rajasthan und können so ihren
+        Lebensunterhalt auch in schwierigen Zeiten bestreiten. Auf <a
+          href="www.joiningthreads.com" class="link link-hover" title="www.joiningthreads.com"
+        >
+          www.joiningthreads.com</a> finden sich viele Fotos und Berichte sowie auch
+        die Möglichkeit, uns zu unterstützen.
+      </Paragraph>
+
+      <Paragraph>
+        Unser Verein zur Förderung des kreativen Glücks hat sich Anfang 2020
+        gegründet und möchte durch Kursangebote, Projekte in Schulen und im
+        Strafvollzug einen Beitrag hier vor Ort leisten sowie die Projekte in
+        Indien unterstützen.
+      </Paragraph>
+    </div>
+  </Container>
+</section>

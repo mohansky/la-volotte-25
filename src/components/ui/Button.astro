@@ -1,0 +1,67 @@
+---
+// components/ui/Button.astro
+
+interface Props {
+  variant?: "primary" | "outline" | "default" | "gradient" | "circle";
+  size?: "sm" | "md" | "lg" | "icon";
+  id?: string;
+  className?: string;
+  href?: string;
+  title: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+}
+
+const {
+  variant = "default",
+  size = "md",
+  id = "",
+  className = "",
+  href,
+  title,
+  type = "button",
+  disabled = false,
+  ...rest
+} = Astro.props;
+
+const sizeClasses = {
+  sm: "btn-sm text-sm px-1 py-1",
+  md: "text-base px-4 py-2",
+  lg: "btn-lg text-lg px-6 py-3",
+  icon: "btn-icon",
+};
+
+const baseClasses = "btn ";
+
+const variantClasses = {
+  default: "btn-neutral text-neutral-content",
+  primary: "btn-primary text-neutral-content",
+  outline:
+    "btn-gradient-primary-outline transition-all duration-300 ease-in-out",
+  gradient:
+    "btn-gradient-primary shadow-md transition-all duration-300 ease-in-out",
+  circle:
+    "btn-circle shadow-md transition-all duration-300 ease-in-out",
+};
+
+const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+---
+
+{
+  href ? (
+    <a href={href} class={classes} id={id} title={title} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button
+      type={type}
+      id={id}
+      class={classes}
+      title={title}
+      disabled={disabled}
+      {...rest}
+    >
+      <slot />
+    </button>
+  )
+}

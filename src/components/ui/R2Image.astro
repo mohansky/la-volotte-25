@@ -1,0 +1,103 @@
+---
+// src/components/R2Image.astro
+export interface Props {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  objectFit?: 'cover' | 'contain' | 'fill' | 'scale-down' | 'none';
+}
+
+const { 
+  src, 
+  alt, 
+  width, 
+  height, 
+  class: className, 
+  loading = 'lazy',
+  objectFit = 'cover'
+} = Astro.props;
+
+import { getImageUrl } from '@/lib/images';
+import { Image } from 'astro:assets';
+import { cn } from '@/lib/utils';
+
+const imageUrl = getImageUrl(src);
+---
+
+<div 
+  class={cn("relative w-full overflow-hidden rounded", className)}
+  style={`aspect-ratio: ${width}/${height};`}
+>
+  <!-- Skeleton placeholder -->
+  <div class="skeleton absolute inset-0 rounded animate-pulse"></div>
+  
+  <!-- Actual image -->
+  <Image
+    src={imageUrl}
+    alt={alt}
+    title={alt}
+    width={width}
+    height={height}
+    class={cn(
+      "absolute inset-0 w-full h-full transition-opacity duration-500 opacity-0 [&.loaded]:opacity-100",
+      objectFit === 'cover' && "object-cover",
+      objectFit === 'contain' && "object-contain",
+      objectFit === 'fill' && "object-fill",
+      objectFit === 'scale-down' && "object-scale-down",
+      objectFit === 'none' && "object-none"
+    )}
+    loading={loading}
+    inferSize={false}
+  />
+</div>
+
+<script>
+  class ImageLoader {
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      this.observeImages();
+    }
+
+    observeImages() {
+      const images = document.querySelectorAll('img[src]') as NodeListOf<HTMLImageElement>;
+      
+      images.forEach(img => {
+        if (img.complete && img.naturalHeight !== 0) {
+          this.handleImageLoad(img);
+        } else {
+          img.addEventListener('load', () => this.handleImageLoad(img));
+          img.addEventListener('error', () => this.handleImageError(img));
+        }
+      });
+    }
+
+    handleImageLoad(img: HTMLImageElement) {
+      img.classList.add('loaded');
+      const skeleton = img.parentElement?.querySelector('.skeleton') as HTMLElement;
+      if (skeleton) {
+        setTimeout(() => {
+          skeleton.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    handleImageError(img: HTMLImageElement) {
+      const skeleton = img.parentElement?.querySelector('.skeleton') as HTMLElement;
+      if (skeleton) {
+        skeleton.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm">Failed to load</div>';
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => new ImageLoader());
+  } else {
+    new ImageLoader();
+  }
+</script>

@@ -1,0 +1,95 @@
+---
+// components/Layout/Footer.astro
+import LVLogo from "../Icons/LVLogo.astro";
+import Address from "../Sections/Address.astro";
+import FooterAddress from "../Sections/FooterAddress.astro"; 
+import FormFooter from "../ui/FormFooter.astro";
+
+const currentYear = new Date().getFullYear();
+
+interface Contact {
+  icon: string;
+  link: string;
+  text: string[];
+}
+
+interface Social {
+  icon: string;
+  link: string;
+  text: string;
+}
+
+interface Props {
+  contactTitle?: string | undefined;
+  contactSubtitle?: string | undefined;
+  author?: any | undefined;
+  footnote?: string | undefined;
+  copyright?: string | undefined;
+  links?: any | undefined;
+  rechtliches?: any | undefined;
+  contact?: Contact[] | undefined;
+  socialTitle?: string | undefined;
+  socials?: Social[] | undefined;
+}
+
+const {
+  copyright = '',
+  links = [],
+  rechtliches = [],
+  contact = [],
+  socialTitle = '',
+  socials = [],
+  contactSubtitle = '',
+  contactTitle = ''
+} = Astro.props;
+---
+
+<footer class="p-10">
+  <LVLogo class="w-40 h-auto mx-auto" />
+</footer>
+
+<footer class="font-quicksand footer footer-horizontal py-10 px-2 lg:px-20">
+  <nav>
+    <FooterAddress
+      contactTitle={contactTitle}
+      contactSubtitle={contactSubtitle}
+      contactdetails={contact}
+      socialTitle={socialTitle}
+      socials={socials}
+    />
+  </nav>
+
+  <nav>
+    <h6 class="footer-title">Rechtliches</h6>
+    {
+      rechtliches.map((link: any) => (
+        <a href={link.URL} class="link link-hover" title={link.name}>
+          {link.name}
+        </a>
+      ))
+    }
+  </nav>
+  <nav class="hidden md:grid">
+    <h6 class="footer-title">Menu</h6>
+    {
+      links.map((link: any) => (
+        <a href={link.link} class="link link-hover" title={link.text}>
+          {link.text}
+        </a>
+      ))
+    }
+  </nav>
+
+  <nav class="justify-self-end hidden md:block">
+    <h6 class="footer-title">Kontakt</h6>
+    <FormFooter />
+  </nav>
+</footer>
+
+<footer
+  class="font-quicksand footer sm:footer-horizontal footer-center bg-base-100 text-base-content p-4 border-t border-primary/30"
+>
+  <aside>
+    <p>Copyright © {currentYear} - {copyright}</p>
+  </aside>
+</footer>

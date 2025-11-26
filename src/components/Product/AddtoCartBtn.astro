@@ -1,0 +1,156 @@
+---
+// components/Product/AddtoCartBtn.astro
+import Button from "../ui/Button.astro";
+import { imageManifest } from "../../data/imageManifest";
+
+interface Product {
+  id?: number | string;
+  preis?: number | string;
+  slug?: string;
+  beschreibung?: string;
+  featureImage?: string;
+  name?: string;
+  farbenFotos?: string;
+}
+
+interface Props {
+  product: Product;
+  variant?: "primary" | "gradient" | "outline" | "default" | "circle";
+  size?: "sm" | "md" | "lg" | "icon";
+  class?: string;
+  className?: string;
+  fullWidth?: boolean;
+}
+
+const {
+  product,
+  variant = "gradient",
+  size,
+  class: customClass,
+  className,
+  fullWidth = true,
+} = Astro.props;
+
+const { id, preis, slug, beschreibung, name, farbenFotos } = product;
+
+let farbenOptions: string[] = [];
+let featureImage = product.featureImage;
+let filteredImages: any[] = [];
+
+if (farbenFotos) {
+  // Use the EXACT same logic as ImageColorGalleryOptimized
+  const cleanPath = farbenFotos.startsWith("/") ? farbenFotos.slice(1) : farbenFotos;
+  const pathParts = cleanPath.split("/");
+  const mainCategory = pathParts[0];
+  const subPath = pathParts.slice(1).join("/");
+
+  // Get all images from the main category
+  const categoryImages = imageManifest.products[mainCategory] || [];
+
+  // Filter images that match the sub-path if specified
+  filteredImages = categoryImages;
+  if (subPath) {
+    filteredImages = categoryImages.filter((img: any) => {
+      const imgPath = img.url.split("/products/")[1];
+      const imgSubPath = imgPath.split("/").slice(1).join("/");
+      const imgDirPath = imgSubPath.substring(0, imgSubPath.lastIndexOf("/"));
+      return imgDirPath.includes(subPath) || imgDirPath === subPath;
+    });
+  }
+
+  if (filteredImages.length > 0) {
+    // Extract colorInfo from filtered images
+    farbenOptions = filteredImages
+      .map((img: any) => img.colorInfo)
+      .filter((colorInfo: string) => colorInfo && colorInfo.trim() !== '')
+      .map((colorInfo: string) => colorInfo.trim());
+    
+    // Remove duplicates and sort
+    farbenOptions = [...new Set(farbenOptions)].sort();
+
+    // Use first color image as feature image
+    featureImage = filteredImages[0].url;
+  }
+}
+
+const farbenFotosOptions = farbenOptions.join(" | ");
+
+// Create a color-to-image mapping for Snipcart
+const colorImageMapping: Record<string, string> = {};
+if (farbenFotos && filteredImages.length > 0) {
+  filteredImages.forEach((img: any) => {
+    if (img.colorInfo && img.colorInfo.trim()) {
+      colorImageMapping[img.colorInfo.trim()] = img.url;
+    }
+  });
+}
+
+// Build className string
+const baseClasses = "snipcart-add-item";
+const widthClasses = fullWidth ? "w-full md:w-auto" : "";
+const customClasses = customClass || className || "";
+const finalClassName = [baseClasses, widthClasses, customClasses]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<Button
+  variant={variant}
+  size={size}
+  className={finalClassName}
+  title={`${name} zum Warenkorb hinzufügen`}
+  data-item-id={id}
+  data-item-price={preis}
+  data-item-url={slug}
+  data-item-description={beschreibung}
+  data-item-image={featureImage}
+  data-item-name={name}
+  data-item-custom1-name="Farbe"
+  data-item-custom1-options={farbenFotosOptions}
+  id={`add-to-cart-${id}`}
+>
+  in den Warenkorb
+</Button>
+
+{farbenOptions.length > 0 && (
+  <script define:vars={{ colorImageMapping, buttonId: `add-to-cart-${id}`, defaultImage: featureImage }}>
+    function updateCartItemImage() {
+      const button = document.getElementById(buttonId);
+      if (!button) return;
+
+      document.addEventListener('snipcart.ready', () => {
+        if (window.Snipcart) {
+          window.Snipcart.events.on('item.adding', (item) => {
+            if (item.id === button.dataset.itemId) {
+              const selectedColor = item.customFields?.find(field => field.name === 'Farbe')?.value;
+              
+              if (selectedColor && colorImageMapping[selectedColor]) {
+                item.image = colorImageMapping[selectedColor];
+              } else if (defaultImage) {
+                item.image = defaultImage;
+              }
+            }
+          });
+
+          window.Snipcart.events.on('item.updated', (item) => {
+            if (item.id === button.dataset.itemId) {
+              const selectedColor = item.customFields?.find(field => field.name === 'Farbe')?.value;
+              
+              if (selectedColor && colorImageMapping[selectedColor]) {
+                item.image = colorImageMapping[selectedColor];
+              } else if (defaultImage) {
+                item.image = defaultImage;
+              }
+            }
+          });
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateCartItemImage);
+    } else {
+      updateCartItemImage();
+    }
+  </script>
+)}

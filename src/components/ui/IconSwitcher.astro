@@ -1,0 +1,50 @@
+---
+import IconTiEmail from "../Icons/IconTiEmail.astro";
+import IconTiFacebook from "../Icons/IconTiFacebook.astro";
+import IconTiInstagram from "../Icons/IconTiInstagram.astro";
+import IconTiLocationPin from "../Icons/IconTiLocationPin.astro";
+import IconTiMobile from "../Icons/IconTiMobile.astro"; 
+
+// Import your SVG icon components
+
+export interface Props {
+  icon: "phone" | "email" | "mapPin" | string;
+  class?: string;
+}
+
+const { icon, class: className = "" } = Astro.props;
+
+// Icon mapping object with proper typing
+const iconComponents: Record<string, any> = {
+  phone: IconTiMobile,
+  email: IconTiEmail,
+  mapPin: IconTiLocationPin,
+  facebook: IconTiFacebook,
+  instagram: IconTiInstagram,
+};
+
+// Type-safe icon lookup
+const IconComponent = iconComponents[icon] || null;
+---
+
+{IconComponent && <IconComponent class={className} />}
+
+<!-- Fallback for unknown icons -->
+{
+  !IconComponent && (
+    <svg
+      class={className}
+      width="17"
+      height="17"
+      viewBox="0 0 17 17"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="8.5" cy="8.5" r="7" />
+      <path d="m6 8.5 1.5 1.5 3-3" />
+    </svg>
+  )
+}

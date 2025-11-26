@@ -1,0 +1,17 @@
+---
+// components/Product/ProductGrid.astro
+interface Props {
+  class?: string;
+  id?: string;
+}
+
+const { class: className, id, ...props } = Astro.props;
+---
+
+<div
+  id={id}
+  class={`grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-6 lg:gap-10 ${className || ''}`}
+  {...props}
+>
+  <slot />
+</div>

@@ -1,0 +1,75 @@
+---
+// components/Sections/FooterAddress.astro
+import Heading from "../ui/Heading.astro";
+import IconSwitcher from "../ui/IconSwitcher.astro";
+import Paragraph from "../ui/Paragraph.astro";
+
+interface Contact {
+  icon: string;
+  link: string;
+  text: string[];
+}
+
+interface Social {
+  icon: string;
+  link: string;
+  text: string;
+}
+
+interface Props {
+  contactTitle: string;
+  contactSubtitle: string;
+  contactdetails: Contact[];
+  socialTitle: string;
+  socials: Social[];
+}
+
+const { contactTitle, contactSubtitle, contactdetails, socialTitle, socials } =
+  Astro.props;
+---
+
+<div>
+  <Heading size="xxs" class="footer-title">{contactTitle}</Heading>
+  <Heading size="xxs" class="mb-5 opacity-60">{contactSubtitle}</Heading>
+  <ul class="space-y-2">
+    {
+      contactdetails.map((item) => (
+        <li class="group mb-3">
+          <a href={item.link} class="flex items-start gap-2 link link-hover" title={`${item.icon} - ${item.text[0]}`}>
+            <IconSwitcher
+              icon={item.icon as "phone" | "envelope" | "map-pin"}
+              class="pt-1 w-5 h-5 fill-primary group-hover:fill-primary/60 transition-all duration-300 ease-in-out"
+            />
+            <span>
+              {item.text.map((text) => (
+                <Paragraph
+                  size="xs"
+                  variant="plain"
+                  class="flex flex-col gap-1"
+                >
+                  {text}
+                </Paragraph>
+              ))}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <Heading size="xxs" class="footer-title mb-5 mt-10">{socialTitle}</Heading>
+  <ul class="flex gap-8">
+    {
+      socials.map((item) => (
+        <li class="group">
+          <a href={item.link} aria-label={item.text} title={`Go to ${item.text}`}>
+            <IconSwitcher
+              icon={item.icon as "facebook" | "instagram"}
+              class="w-8 h-8 fill-primary group-hover:fill-primary/60 transition-all duration-300 ease-in-out"
+            />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

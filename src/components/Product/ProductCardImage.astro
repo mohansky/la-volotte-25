@@ -1,0 +1,66 @@
+---
+// components/Product/ProductCardImage.astro
+import { Image } from "astro:assets";
+import LVLogo from "../Icons/LVLogo.astro";
+import { findFeatureImages, getPrimaryImageUrl } from "@/data/imageManifest";
+
+interface Props {
+  subDirectory?: string | undefined;
+  width?: number | undefined;
+  height?: number | undefined;
+}
+
+const { subDirectory = "", width = 600, height = 600 } = Astro.props;
+
+function getProductName(csvPath: string): string {
+  if (!csvPath) return "Image";
+  const pathParts = csvPath.split("/");
+  return pathParts[pathParts.length - 2] || "Image";
+}
+
+const imageName = getProductName(subDirectory);
+
+// Find images using the build-time generated manifest
+let primaryImageUrl = "";
+let hasImage = false;
+
+if (subDirectory) {
+  try {
+    const featureImages = findFeatureImages(subDirectory);
+   
+    if (featureImages.length > 0) {
+      primaryImageUrl = getPrimaryImageUrl(featureImages);
+      hasImage = true;
+    }
+  } catch (error) {
+    console.error("Error processing images:", error);
+  }
+}
+---
+
+<figure class="relative m-0">
+  {hasImage ? (
+    <Image
+      src={primaryImageUrl}
+      alt={imageName}
+      width={width}
+      height={height}
+      class="w-full h-auto object-contain bg-base-100 border border-primary rounded-lg"
+      loading="lazy"
+      format="webp"
+       title={imageName}
+    />
+  ) : (
+    <div class="bg-base-100 border border-primary rounded-lg flex items-center justify-center p-4">
+      <div class="text-center">
+        <LVLogo />
+        <div class="text-xs mt-2 text-base-content/50 max-w-32 overflow-hidden text-center">
+          Path: {subDirectory || "none"}
+        </div>
+        <div class="text-xs text-error">
+          No image found
+        </div>
+      </div>
+    </div>
+  )}
+</figure>

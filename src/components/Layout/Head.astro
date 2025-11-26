@@ -1,0 +1,55 @@
+---
+// components/Layout/Head.astro
+import { getCollection } from "astro:content";
+import Schema from "./Schema.astro";
+
+const siteData = await getCollection("siteData");
+const siteInfo = siteData[0]?.data;
+const site = siteInfo;
+---
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Google Tag Manager (controlled by Klaro) -->
+  <script is:inline data-type="text/partytown" data-name="google-tag-manager">
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != "dataLayer" ? "&l=" + l : "";
+      j.async = true;
+      j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, "script", "dataLayer", "GTM-TQZ2SQM");
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <Schema />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{site?.title}</title>
+  <meta name="description" content={site?.description} />
+  <meta property="og:title" content={site?.title} />
+  <meta property="og:description" content={site?.description} />
+  <meta
+    property="og:image"
+    content={`${site?.basepath}/images/La-Volotte-Logo.svg`}
+  />
+  <meta property="og:url" content={`${site?.basepath}/`} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={site?.title} />
+  <meta name="twitter:description" content={site?.description} />
+  <meta
+    name="twitter:image"
+    content={`${site?.basepath}/images/La-Volotte-Logo.svg"`}
+  />
+  <link rel="canonical" href={site?.basepath} />
+  <meta name="robots" content="index, follow" />
+  <meta name="keywords" content={site?.keywords?.join(",")} />
+  <meta name="author" content={site?.author?.name} />
+</head>

@@ -1,0 +1,44 @@
+---
+// components/ui/FAQAccordian.astro
+import Heading from "./Heading.astro";
+
+interface FAQItem {
+  title: string;
+  content: string;
+}
+interface Props {
+  faqItem: FAQItem[];
+}
+const { faqItem } = Astro.props;
+---
+
+<div class="space-y-2">
+  {
+    faqItem.map((item: FAQItem, index) => (
+      <div class="collapse collapse-plus bg-base-200/40 border-0">
+        <input type="checkbox" id={`faq-${index}`} />
+        <Heading size="md" fontweight="bold" class="collapse-title">
+          {item.title}
+        </Heading>
+        <Heading size="xs" fontweight="normal" class="collapse-content">
+          {item.content}
+        </Heading>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  document.querySelectorAll(".collapse-title").forEach((title) => {
+    title.addEventListener("click", () => {
+      const checkbox = title.parentElement?.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement;
+      if (checkbox && checkbox.checked) {
+        setTimeout(() => {
+          checkbox.checked = false;
+        }, 0);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,109 @@
+/* Custom Klaro Cookie Consent Styling for DaisyUI Theme */
+
+/* Override Klaro colors to match your brand */
+.klaro .cookie-modal,
+.klaro .cookie-notice {
+  font-family: inherit;
+}
+
+/* Modal styling */
+.klaro .cookie-modal .cm-modal {
+  max-width: 600px;
+  border-radius: 0.5rem;
+}
+
+/* Buttons styling to match DaisyUI */
+.klaro .cm-btn {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.klaro .cm-btn.cm-btn-success {
+  background: hsl(var(--p));
+  color: hsl(var(--pc));
+}
+
+.klaro .cm-btn.cm-btn-success:hover {
+  background: hsl(var(--pf));
+}
+
+.klaro .cm-btn.cm-btn-info {
+  background: hsl(var(--b2));
+  color: hsl(var(--bc));
+}
+
+.klaro .cm-btn.cm-btn-info:hover {
+  background: hsl(var(--b3));
+}
+
+.klaro .cm-btn.cm-btn-danger {
+  background: transparent;
+  color: hsl(var(--bc));
+  border: 1px solid hsl(var(--bc) / 0.2);
+}
+
+.klaro .cm-btn.cm-btn-danger:hover {
+  background: hsl(var(--b2));
+}
+
+/* Notice bar styling */
+.klaro .cookie-notice {
+  background: hsl(var(--b1));
+  border-top: 1px solid hsl(var(--bc) / 0.1);
+  box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Switch styling to match DaisyUI toggle */
+.klaro .cm-list-input:checked + .cm-list-label .slider {
+  background: hsl(var(--p));
+}
+
+.klaro .slider {
+  border-radius: 1rem;
+}
+
+/* Modal backdrop */
+.klaro .cookie-modal {
+  background: hsl(var(--b1));
+}
+
+.klaro .cm-modal .hide {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Service items */
+.klaro .cm-list-label {
+  color: hsl(var(--bc));
+}
+
+.klaro .cm-list-description {
+  color: hsl(var(--bc) / 0.7);
+}
+
+/* Links */
+.klaro a {
+  color: hsl(var(--p));
+  text-decoration: underline;
+}
+
+.klaro a:hover {
+  color: hsl(var(--pf));
+}
+
+/* Required badge */
+.klaro .cm-required {
+  color: hsl(var(--su));
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Purpose badges */
+.klaro .cm-purpose {
+  background: hsl(var(--b2));
+  color: hsl(var(--bc));
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+}

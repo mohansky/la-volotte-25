@@ -1,0 +1,124 @@
+site:
+  name: La Volotte
+  title: La Volotte | Wolle, Filz und Glanz
+  description: La Volotte | Wolle, Filz und Glanz. Wir bieten eine große Auswahl an ausgesuchten, hochwertigen Naturgarnen aus verschiedenen Ländern!
+  basepath: https://la-volotte.de
+  ogImageURL: ./images/La-Volotte-Logo.svg
+  keywords:
+    - Wev Design
+
+  author:
+    name: La Volotte
+    email: wolle@la-volotte.de
+    url: https://www.mohankumar.dev
+
+  links:
+    - text: Home
+      link: /
+    - text: Produkte
+      link: /produkte
+    - text: Aktuelles
+      link: /aktuelles
+    - text: FAQ
+      link: /faq
+    - text: Kontakt
+      link: /kontakt
+
+  footnote1: Developed with ♥ and ♫ in Bangalore
+  footnote: Built with Astrojs
+  copyright: La Volotte
+  email: wolle@la-volotte.de
+
+  hero:
+    - bgImage: /site/ybimladaen.jpg
+      title: Naturgarne mit Geschichten, von Herzen handverlesen
+      subtitle: Wir bieten eine große Auswahl an ausgesuchten, hochwertigen Naturgarnen aus verschiedenen Ländern mit Liebe und Leidenschaft!
+      btnLink: /produkte
+      btnText: Kollektion entdecken
+
+  ladengallery:
+    - name: La Volotte
+      image: /site/gallery/laden1.jpg
+    - name: La Volotte
+      image: /site/gallery/laden2.jpg
+    - name: La Volotte
+      image: /site/gallery/laden3.jpg
+    - name: La Volotte
+      image: /site/gallery/laden4.jpg
+
+  ctaTitle: La Volotte
+  ctaText: Wir bieten eine große Auswahl an ausgesuchten, hochwertigen Naturgarnen aus verschiedenen Ländern!
+  ctaBg: /site/cta-bg.svg
+  ctaBtnText: Alle Produkte
+  ctaBtnLink: /produkte
+
+  rechtliches:
+    - name: Impressum
+      URL: /rechtliches/impressum
+    - name: Datenschutz
+      URL: /rechtliches/datenschutz
+    - name: AGB
+      URL: /rechtliches/agb
+    - name: Widerrufsrecht
+      URL: /rechtliches/widerrufsrecht
+    - name: Versandbedingungen
+      URL: /rechtliches/versand
+
+  openningHours:
+    title: Öffnungszeiten
+    dayTimeList:
+      - day: Montag
+        time: geschlossen
+      - day: Dienstag
+        time: geschlossen
+      - day: Mittwoch
+        time: 11:00 – 15:00 Uhr
+      - day: Donnerstag
+        time: 15:00 – 18:00 Uhr
+      - day: Freitag
+        time: 15:00 – 18:00 Uhr
+      - day: Samstag
+        time: 11:00 – 15:00 Uhr
+      - day: Sonntag
+        time: geschlossen
+
+  faqItem:
+    - title: Wie lange dauert meine Bestellung?
+      content: Sofern das bestellte Garn lieferbar ist, wird die Ware nach Zahlungseingang verschickt.
+    - title: Wie kann ich bezahlen?
+      content: Die Rechnung wird per Mail verschickt und kann dann direkt per Überweisung bezahlt werden. Sollte ein gewünschter Artikel nicht lieferbar sein, wird dies mitgeteilt, und der Artikel kann zu gegebener Zeit neu bestellt werden.
+    - title: Kann ich Artikel zurücksenden?
+      content: Ja, eine Rücksendung ist möglich, erfolgt aber auf eigene Kosten. Es gibt keinen Portogutschein für Retouren.
+    - title: Ist telefonische Beratung möglich?
+      content: Ja, grundsätzlich ist dies während der Öffnungszeiten möglich. Eine mögliche Videoberatung bitte per Mail anfragen.
+    - title: Wie hoch sind die Portokosten?
+      content: Der Versand mit DHL wird bis 2 kg pauschal mit €4,50 berechnet. Darüber werden die aktuellen Portokosten fällig. Ab einem Warenwert von € 80,00 erfolgt der Versand gratis.
+    - title: Ist eine Abholung vor Ort möglich?
+      content: Ja, die Abholung vor Ort ist grundsätzlich zu den Öffnungszeiten möglich. Es werden dann keine Portogebühren fällig. Bei Selbstabholung bitte den Gutschein ABHOLUNG verwenden.
+
+  socialTitle: Folgen Sie uns
+  socials:
+    - link: https://www.facebook.com/Lavolotte/
+      icon: facebook
+      text: facebook link
+    - link: https://www.instagram.com/la_volotte_wollladen/
+      icon: instagram
+      text: instagram link
+
+  contactTitle: La Volotte
+  contactSubtitle: Wolle, Filz und Glanz
+  contactdetails:
+    - link: tel:+49024147587794
+      icon: phone
+      text:
+        - +49 (0) 241 47587794
+    - link: mailto:wolle@la-volotte.de
+      icon: email
+      text:
+        - wolle@la-volotte.de
+    - link: /
+      icon: mapPin
+      text:
+        - Haus Hersbach 1,
+        - 54570 Mürlenbach,
+        - Deutschland

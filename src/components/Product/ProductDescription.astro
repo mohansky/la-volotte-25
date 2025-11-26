@@ -1,0 +1,17 @@
+---
+// components/Product/ProductDescription.astro
+
+interface Product {
+  beschreibung?: string;
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { beschreibung } = product;
+---
+
+<h5>Kurzbeschreibung</h5>
+{beschreibung ? <p>{beschreibung}</p> : null}

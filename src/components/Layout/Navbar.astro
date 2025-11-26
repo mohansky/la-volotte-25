@@ -1,0 +1,175 @@
+---
+// components/Layout/Navbar.astro
+import LVLogo from "../Icons/LVLogo.astro";
+import ShoppingCart from "./ShoppingCart.astro";
+import IconTiMenu from "../Icons/IconTiMenu.astro";
+import IconTiClose from "../Icons/IconTiClose.astro";
+
+interface NavLink {
+  text: string;
+  link: string;
+}
+
+interface Props {
+  links?: NavLink[] | undefined;
+}
+
+const { links = [] } = Astro.props;
+---
+
+<script>
+  let lastScrollTop = 0;
+  const navbar = document.getElementById("navbar");
+  const drawerToggle = document.getElementById(
+    "my-drawer-3"
+  ) as HTMLInputElement;
+  const drawerSide = document.querySelector(".drawer-side") as HTMLElement;
+
+  // Fade-in/out effect for drawer
+  if (drawerToggle && drawerSide) {
+    drawerToggle.addEventListener("change", () => {
+      if (drawerToggle.checked) {
+        // Fade in
+        drawerSide.style.opacity = "0";
+        drawerSide.style.display = "block";
+        setTimeout(() => {
+          drawerSide.style.opacity = "1";
+        }, 10);
+      } else {
+        // Fade out
+        drawerSide.style.opacity = "0";
+        setTimeout(() => {
+          drawerSide.style.display = "none";
+        }, 300); // Match this with your transition duration
+      }
+    });
+  }
+
+  window.addEventListener("scroll", () => {
+    let scrollTop = window.scrollY || document.documentElement.scrollTop;
+    if (scrollTop > lastScrollTop) {
+      navbar?.classList.add("-translate-y-full");
+    } else {
+      navbar?.classList.remove("-translate-y-full");
+    }
+    lastScrollTop = scrollTop;
+
+    const heroSectionHeight = window.innerHeight;
+
+    if (scrollTop > heroSectionHeight) {
+      navbar?.classList.add("bg-base-100");
+      navbar?.classList.add("shadow-md");
+      navbar?.classList.remove("bg-transparent");
+    } else {
+      navbar?.classList.remove("bg-base-100");
+      navbar?.classList.remove("shadow-md");
+      navbar?.classList.add("bg-transparent");
+    }
+  });
+</script>
+
+<style>
+  .drawer-side {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    display: none;
+  }
+
+  .drawer-toggle:checked ~ .drawer-side {
+    opacity: 1;
+    display: block;
+  }
+</style>
+
+<div class="drawer drawer-end z-30">
+  <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content flex flex-col">
+    <div
+      id="navbar"
+      class="z-10 navbar backdrop-blur-3xl w-full fixed top-0 shadow-xs px-2 md:px-5 lg:px-10 transition-transform"
+    >
+      <!-- Logo (Left) -->
+      <div class="navbar-start">
+        <a href="/" class="flex items-center" title="Go to Home">
+          <div class="w-20 h-auto">
+            <LVLogo />
+          </div>
+          <p class="sr-only">La Volotte</p>
+        </a>
+      </div>
+
+      <!-- Desktop Menu (Center) -->
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1 gap-3">
+          {
+            links.map(({ text, link }) => (
+              <li class="uppercase font-quicksand text-base font-bold hover:text-primary transition-colors duration-200">
+                <a href={link} title={`Go to ${text}`} class="">
+                  {text}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Shopping Cart + Mobile Menu Toggle (Right) -->
+      <div class="navbar-end">
+        <ShoppingCart />
+        <!-- Mobile Menu Toggle -->
+        <div class="lg:hidden ml-2">
+          <label
+            for="my-drawer-3"
+            aria-label="open sidebar"
+            class="btn btn-circle btn-ghost"
+          >
+            <span class="sr-only">Open menu</span>
+            <IconTiMenu class="h-5 w-5" />
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Page content here -->
+  </div>
+
+  <!-- Mobile menu when Open with close button -->
+  <div class="drawer-side z-30">
+    <div class="menu bg-base-100 min-h-full w-full" aria-label="Navigation">
+      <a href="/" class="text-xl" title="Go to Home">
+        <div class="w-20 h-auto">
+          <LVLogo />
+        </div>
+        <p class="sr-only">La Volotte</p>
+      </a>
+
+      <span id="close-menu-label" class="sr-only">Close menu</span>
+      <label
+        for="my-drawer-3"
+        aria-label="close sidebar"
+        aria-labelledby="close-menu-label"
+        class="absolute top-7 right-2 drawer-overlay z-30 btn btn-circle"
+      >
+        <IconTiClose class="w-5 h-5" />
+      </label>
+      <ul
+        class="font-quicksand text-xl space-y-10 pt-10"
+        aria-label="Navigation"
+      >
+        {
+          links.map(({ text, link }) => (
+            <li class="uppercase font-quicksand text-base font-bold hover:text-primary transition-colors duration-200">
+              <a
+                href={link}
+                title={`Go to ${text}`}
+                class="mx-auto"
+                aria-label={`Go to ${text}`}
+              >
+                {text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
